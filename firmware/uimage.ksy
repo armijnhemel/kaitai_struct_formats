@@ -17,7 +17,14 @@ types:
   uheader:
     seq:
       - id: magic
-        contents: [0x27, 0x05, 0x19, 0x56]
+        type: u4
+        enum: magic_types
+        valid:
+          any-of:
+            - magic_types::uimage
+            - magic_types::bix
+            - magic_types::bix2
+            - magic_types::bix3
       - id: header_crc
         type: u4
       - id: timestamp
@@ -375,3 +382,17 @@ enums:
     47:
       id: amlimage
       doc: Amlogic Boot Image
+  magic_types:
+    0x27051956:
+      id: uimage
+      doc: The standard U-Boot header magic.
+    0x83800000:
+      id: bix
+      doc: An adapted magic used by ZyXEL and Cisco
+      doc-ref: https://github.com/ReFirmLabs/binwalk/pull/482/commits/f21282bce5b699fe627102a0b647416acd54933b
+    0x80800002:
+      id: bix2
+      doc: A variant of the .bix header found in the EnGenius ECS1112FP
+    0x93000000:
+      id: bix3
+      doc: A variant of the .bix header found in the EnGenius ECS1528FP
