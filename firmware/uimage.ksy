@@ -90,10 +90,48 @@ types:
             - uimage_comp::lzo
             - uimage_comp::lz4
             - uimage_comp::zstd
-      - id: name
+      - id: name_or_asus_info
         size: 32
+        type: name_or_asus_info
+    instances:
+      name:
+        value: name_or_asus_info.name
+      asus_info:
+        value: name_or_asus_info.asus_info
+  name_or_asus_info:
+    seq:
+      - id: name
         encoding: UTF-8
         type: strz
+    instances:
+      asus_info:
+        pos: 0
+        type: asus_firmware_information
+  asus_firmware_information:
+    seq:
+      - id: kernel_version
+        type: version
+      - id: fs_version
+        type: version
+      - id: product_id
+        type: strz
+        encoding: UTF-8
+        size: 12
+      - id: hardware_versions
+        type: version
+        repeat: expr
+        repeat-expr: 8
+    doc: |
+      ASUS has overloaded the name field and stores information about the
+      firmware here, including version information and the product ID.
+      This is documented in for example the GPL source code of the RT-AC55UHP
+      device, in the directory `release/src/asustools/mkimage.src/include/image.h`
+  version:
+    seq:
+      - id: major
+        type: u1
+      - id: minor
+        type: u1
 enums:
   uimage_os:
     0:
