@@ -28,10 +28,23 @@ instances:
     size: boot_sector.size_root_dir
     type: root_directory
 types:
+  jmp_instruction:
+    seq:
+      - id: jmp_1
+        type: u1
+      - id: jmp_2
+        type: u1
+      - id: jmp_3
+        type: u1
+    instances:
+      is_valid:
+        value: '(jmp_1 == 0xeb and jmp_3 == 0x90) or jmp_1 == 0xe9'
   boot_sector:
     seq:
       - id: jmp_instruction
-        size: 3
+        type: jmp_instruction
+        valid:
+          expr: jmp_instruction.is_valid
       - id: oem_name
         type: str
         encoding: ASCII
@@ -85,6 +98,8 @@ types:
       - id: ls_per_clus
         -orig-id: BPB_SecPerClus
         type: u1
+        valid:
+          any-of: [1, 2, 4, 8, 16, 32, 64, 128]
         doc: Logical sectors per cluster
       - id: num_reserved_ls
         -orig-id: BPB_RsvdSecCnt
