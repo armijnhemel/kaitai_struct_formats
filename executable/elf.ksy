@@ -485,6 +485,17 @@ types:
                 'bits::b32': u4
                 'bits::b64': u8
         instances:
+          body:
+            io: _root._io
+            pos: ofs_body
+            size: len_body
+            type:
+              switch-on: type
+              cases:
+                'ph_type::interp': ph_interpreter
+                'ph_type::dynamic': ph_dynamic_section
+                'ph_type::note': note_section
+            if: type != ph_type::null_type
           flags_obj:
             type:
               switch-on: _root.bits
@@ -492,6 +503,16 @@ types:
                 'bits::b32': phdr_type_flags(flags32)
                 'bits::b64': phdr_type_flags(flags64)
             -webide-parse-mode: eager
+        types:
+          ph_interpreter:
+            doc-ref:
+              - https://gabi.xinuos.com/v42/elf/08-dynamic.html#program-interpreter
+              - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/program-interpreter.html
+            -webide-representation: '{path_name}'
+            seq:
+              - id: path_name
+                type: strz
+                encoding: ASCII
       section_header:
         -orig-id:
           - Elf32_Shdr
@@ -564,7 +585,7 @@ types:
             type:
               switch-on: type
               cases:
-                'sh_type::dynamic': dynamic_section
+                'sh_type::dynamic': sh_dynamic_section
                 'sh_type::strtab': strings_struct
                 'sh_type::dynsym': dynsym_section
                 'sh_type::symtab': dynsym_section
@@ -596,20 +617,29 @@ types:
             # For an explanation of why UTF-8 instead of ASCII, see the comment
             # on the `name` attribute in the `dynsym_section_entry` type.
             encoding: UTF-8
-      dynamic_section:
+      sh_dynamic_section:
+        doc: |
+          Same type as `ph_dynamic_section`, but it depends on
+          `_parent.linked_section`, so it can be used only in the
+          `section_header` type. See the documentation for `ph_dynamic_section`
+          for more details.
         doc-ref:
           - https://gabi.xinuos.com/v42/elf/08-dynamic.html#dynamic-section
           - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/dynamic-section.html
         seq:
           - id: entries
             -orig-id: _DYNAMIC
-            type: dynamic_section_entry
+            type: sh_dynamic_section_entry
             repeat: until
             repeat-until: _.tag_enum == dynamic_array_tags::null
         instances:
           is_string_table_linked:
             value: _parent.linked_section.type == sh_type::strtab
-      dynamic_section_entry:
+      sh_dynamic_section_entry:
+        doc: |
+          Same type as `ph_dynamic_section_entry`, but with the `value_str`
+          instance - see the documentation for `ph_dynamic_section` for more
+          details.
         doc-ref:
           - https://gabi.xinuos.com/v42/elf/08-dynamic.html#dynamic-section
           - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/dynamic-section.html
@@ -645,6 +675,91 @@ types:
             type: strz
             encoding: ASCII
             if: is_value_str and _parent.is_string_table_linked
+            -webide-parse-mode: eager
+          is_value_str:
+            value: |
+              value_or_ptr != 0 and (
+                tag_enum == dynamic_array_tags::needed or
+                tag_enum == dynamic_array_tags::soname or
+                tag_enum == dynamic_array_tags::rpath or
+                tag_enum == dynamic_array_tags::runpath or
+                tag_enum == dynamic_array_tags::sunw_auxiliary or
+                tag_enum == dynamic_array_tags::sunw_filter or
+                tag_enum == dynamic_array_tags::auxiliary or
+                tag_enum == dynamic_array_tags::filter or
+                tag_enum == dynamic_array_tags::config or
+                tag_enum == dynamic_array_tags::depaudit or
+                tag_enum == dynamic_array_tags::audit
+              )
+      ph_dynamic_section:
+        doc: |
+          Same type as `sh_dynamic_section`, but it does not use
+          `_parent.linked_section`, which is available only in section headers
+          (i.e. when `_parent` is of type `section_header`). This allows it to
+          be used in program headers (i.e. from the `program_header` type).
+
+          The inability to access `linked_section` means that offsets in the
+          string table (which should be stored in the `.dynstr` section) will
+          not be resolved to strings and will be provided only in raw form in
+          the `value_or_ptr` field. In other words, the
+          `ph_dynamic_section_entry` type has no `value_str` instance, unlike
+          the `sh_dynamic_section_entry` type.
+
+          There is another way to find the string table referenced by the
+          dynamic section entries that does not rely on `linked_section`, but is
+          a bit more complex (and is therefore considered out of scope of this
+          .ksy spec): the mandatory dynamic tag `dynamic_array_tags::strtab`
+          (`DT_STRTAB`) specifies the virtual address of the string table, and
+          `dynamic_array_tags::strsz` (`DT_STRSZ`) specifies its size in bytes.
+          The virtual address can be converted to a file offset by reading the
+          program headers - see the source code for the `readelf` command:
+
+          1. [`offset_from_vma` call site with an address from `DT_STRTAB` as an
+            argument](https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=binutils/readelf.c;h=f50d9281ea4bf7cc722c316b63620c52134ca9b6;hb=refs/tags/binutils-2_46_1#l13018)
+          2. [`offset_from_vma` function
+            definition](https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=binutils/readelf.c;h=f50d9281ea4bf7cc722c316b63620c52134ca9b6;hb=refs/tags/binutils-2_46_1#l7788)
+        doc-ref:
+          - https://gabi.xinuos.com/v42/elf/08-dynamic.html#dynamic-section
+          - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/dynamic-section.html
+        seq:
+          - id: entries
+            -orig-id: _DYNAMIC
+            type: ph_dynamic_section_entry
+            repeat: until
+            repeat-until: _.tag_enum == dynamic_array_tags::null
+      ph_dynamic_section_entry:
+        doc: |
+          Same type as `sh_dynamic_section_entry`, but without the `value_str`
+          instance - see the documentation for `ph_dynamic_section` for more
+          details.
+        doc-ref:
+          - https://gabi.xinuos.com/v42/elf/08-dynamic.html#dynamic-section
+          - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/dynamic-section.html
+        -webide-representation: "{tag_enum}: {value_or_ptr} is_str:{is_value_str} {flag_1_values:flags}"
+        seq:
+          - id: tag
+            type:
+              switch-on: _root.bits
+              cases:
+                'bits::b32': u4
+                'bits::b64': u8
+          - id: value_or_ptr
+            type:
+              switch-on: _root.bits
+              cases:
+                'bits::b32': u4
+                'bits::b64': u8
+        instances:
+          tag_enum:
+            value: tag
+            enum: dynamic_array_tags
+          flag_values:
+            type: dt_flag_values(value_or_ptr)
+            if: "tag_enum == dynamic_array_tags::flags"
+            -webide-parse-mode: eager
+          flag_1_values:
+            type: dt_flag_1_values(value_or_ptr)
+            if: "tag_enum == dynamic_array_tags::flags_1"
             -webide-parse-mode: eager
           is_value_str:
             value: |
@@ -2387,12 +2502,18 @@ enums:
     2: pltrelsz          # Size in bytes of PLT relocs
     3: pltgot            # Processor defined value
     4: hash              # Address of symbol hash table
-    5: strtab            # Address of string table
+    5:
+      id: strtab
+      -orig-id: DT_STRTAB
+      doc: Address of string table
     6: symtab            # Address of symbol table
     7: rela              # Address of Rela relocs
     8: relasz            # Total size of Rela relocs
     9: relaent           # Size of one Rela reloc
-    10: strsz            # Size of string table
+    10:
+      id: strsz
+      -orig-id: DT_STRSZ
+      doc: Size of string table
     11: syment           # Size of one symbol table entry
     12: init             # Address of init function
     13: fini             # Address of termination function
