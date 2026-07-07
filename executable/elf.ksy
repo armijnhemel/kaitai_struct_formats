@@ -973,10 +973,13 @@ enums:
     3: shared
     # ET_CORE
     4: core
-  # https://www.sco.com/developers/gabi/latest/ch4.eheader.html
-  # https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;hb=0f62fe0532
-  # https://github.com/NationalSecurityAgency/ghidra/blob/f5615aa240/Ghidra/Features/Base/src/main/java/ghidra/app/util/bin/format/elf/ElfConstants.java#L158-L510
-  # https://github.com/llvm/llvm-project/blob/f6928cf45516/llvm/include/llvm/BinaryFormat/ELF.h#L130
+  # https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l106
+  # https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l169
+  # https://gabi.xinuos.com/elf/a-emachine.html
+  # https://github.com/torvalds/linux/blob/8cd9520d35a6c38db6567e97dd93b1f11f185dc6/include/uapi/linux/elf-em.h (Git tag "v7.1")
+  # https://github.com/NationalSecurityAgency/ghidra/blob/c0f584bf229fffba61b36431f3ce30c0c3e4e682/Ghidra/Features/Base/src/main/java/ghidra/app/util/bin/format/elf/ElfConstants.java#L158-L562 (Git tag "Ghidra_12.1.2_build")
+  # https://github.com/llvm/llvm-project/blob/ca7933e47d3a3451d81e72ac174dcb5aa28b59d1/llvm/include/llvm/BinaryFormat/ELF.h#L132-L328 (Git tag "llvmorg-22.1.8")
+  # https://groups.google.com/g/generic-abi
   machine:
     0:
       id: no_machine
@@ -984,12 +987,14 @@ enums:
       doc: No machine
     1:
       id: m32
+      -orig-id: EM_M32
       doc: AT&T WE 32100
     2:
       id: sparc
+      -orig-id: EM_SPARC
       doc: Sun SPARC
     3:
-      id: x86
+      id: i386
       -orig-id: EM_386
       doc: Intel 80386
     4:
@@ -1002,12 +1007,22 @@ enums:
       doc: Motorola m88k family
     6:
       id: iamcu
+      -orig-id:
+        - EM_IAMCU
+        - EM_486 # Historical name/meaning
       doc: |
-        Intel MCU
+        Intel MCU.
 
-        was assigned to `EM_486` (for Intel i486), but that value was deprecated
-        and replaced with this one
+        This value was originally assigned as `EM_486` (for Intel i486), but was
+        likely never used in that sense, or only briefly (in
+        <https://www.sco.com/developers/gabi/2001-04-24/ch4.eheader.html>, it is
+        marked as "Reserved for future use (was `EM_486`)" and there is an HTML
+        comment `<!-- before 1994, was EM_486, Intel 80486 -->`). See also
+        <https://landley.net/notes-2009.html#08-11-2009>. In 2015, this number
+        was repurposed to `EM_IAMCU`, see
+        <https://groups.google.com/g/generic-abi/c/pXfB_RXGY8Q/m/QntbSjBX7GkJ>.
       doc-ref:
+        - https://groups.google.com/g/generic-abi/c/pXfB_RXGY8Q/m/QntbSjBX7GkJ
         - https://sourceware.org/bugzilla/show_bug.cgi?id=18404
         - https://gcc.gnu.org/legacy-ml/gcc/2015-05/msg00090.html
         - https://github.com/gcc-mirror/gcc/blob/240f07805d/libgo/go/debug/elf/elf.go#L389
@@ -1017,21 +1032,57 @@ enums:
       doc: Intel 80860
     8:
       id: mips
-      doc: MIPS R3000 big-endian
+      -orig-id: EM_MIPS
+      doc: |
+        MIPS I architecture.
+
+        Note: some sources describe this as "MIPS RS3000 big-endian", but that's
+        outdated - in practice, it is used for little-endian binaries as well,
+        see <https://github.com/radareorg/radare2/issues/2078>. Historically,
+        there was a value `EM_MIPS_RS3_LE`, which stood for
+        "MIPS R3000 little-endian", but it has long since fallen out of use
+        (it's unclear whether it was ever used in practice at all).
     9:
       id: s370
-      doc: IBM System/370
-    10:
-      id: mips_rs3_le
-      doc: MIPS R3000 little-endian
+      -orig-id: EM_S370
+      doc: IBM System/370 (S/370)
+    # 10:
+    #   id: mips_rs3_le
+    #   -orig-id:
+    #     - EM_MIPS_RS3_LE # MIPS R3000 little-endian
+    #     - EM_MIPS_RS4_BE # MIPS R4000 big-endian
+    #   doc: |
+    #     MIPS R3000 little-endian (Oct 4 1999 Draft). Deprecated.
+    #
+    #     The Linux kernel source code (Git tag "v7.1") has the [following
+    #     comment](https://github.com/torvalds/linux/blob/8cd9520d35a6c38db6567e97dd93b1f11f185dc6/include/uapi/linux/elf-em.h#L15-L19):
+    #
+    #     > Next two are historical and binaries and modules of these types will
+    #     > be rejected by Linux.
+    #
+    #     <https://github.com/radareorg/radare2/issues/2078> shows that the
+    #     `EM_MIPS` value is also used for little-endian binaries (not just
+    #     big-endian).
+    #   doc-ref: https://sourceware.org/git/gitweb.cgi?p=binutils-gdb.git;h=39834263784567c306fbccb8230ddd1badca53fe
+    # 11:
+    #   id: old_sparc_v9
+    #   -orig-id: EM_OLD_SPARCV9
+    #   doc: Old version of Sparc v9, from before the ABI. Deprecated.
+    #   doc-ref: https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l121
     15:
       id: parisc
-      doc: Hewlett-Packard PA-RISC
+      -orig-id: EM_PARISC
+      doc: Hewlett-Packard PA-RISC (HP/PA or HPPA)
     17:
       id: vpp500
+      -orig-id:
+        - EM_VPP500
+        - EM_VPP550 # https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l129
+        - EM_PPC_OLD # Old version of PowerPC. Deprecated.
       doc: Fujitsu VPP500
     18:
       id: sparc32plus
+      -orig-id: EM_SPARC32PLUS
       doc: Sun's "v8plus"
     19:
       id: i960
@@ -1040,70 +1091,96 @@ enums:
     20:
       id: powerpc
       -orig-id: EM_PPC
-      doc: PowerPC
+      doc: 32-bit PowerPC
     21:
       id: powerpc64
       -orig-id: EM_PPC64
-      doc: PowerPC 64-bit
+      doc: 64-bit PowerPC
     22:
       id: s390
-      doc: IBM System/390
+      -orig-id: EM_S390
+      doc: IBM System/390 (S/390)
     23:
       id: spu
-      doc: IBM SPU/SPC
+      -orig-id: EM_SPU
+      doc: STI (Sony, Toshiba and IBM) Cell BE SPU
     36:
       id: v800
+      -orig-id: EM_V800
       doc: NEC V800 series
     37:
       id: fr20
+      -orig-id: EM_FR20
       doc: Fujitsu FR20
     38:
       id: rh32
-      doc: TRW RH-32
+      -orig-id: EM_RH32
+      doc: TRW RH32
     39:
-      id: rce
-      doc: Motorola RCE
+      id: mcore
+      -orig-id:
+        - EM_MCORE
+        - EM_RCE
+        - EM_CSKY_OLD # C-SKY historically used 39, the same value as MCore, from which the architecture was derived.
+      doc: |
+        Motorola M*Core (also spelled as MCore or M-Core)
+
+        `EM_RCE` is "Old name for MCore" according to
+        <https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l152>
     40:
       id: arm
-      doc: ARM
+      -orig-id: EM_ARM
+      doc: ARM 32-bit architecture (AArch32)
     41:
       id: old_alpha
-      -orig-id: EM_FAKE_ALPHA
+      -orig-id:
+        - EM_OLD_ALPHA
+        - EM_FAKE_ALPHA
+        - EM_ALPHA_STD
       doc: DEC Alpha
     42:
       id: superh
       -orig-id: EM_SH
-      doc: Hitachi SH
+      doc: Renesas (formerly Hitachi) SuperH SH
     43:
       id: sparc_v9
       -orig-id: EM_SPARCV9
       doc: SPARC v9 64-bit
     44:
       id: tricore
-      doc: Siemens TriCore
+      -orig-id: EM_TRICORE
+      doc: Siemens TriCore embedded processor
     45:
       id: arc
+      -orig-id: EM_ARC
       doc: Argonaut RISC Core
     46:
       id: h8_300
-      doc: Hitachi H8/300
+      -orig-id: EM_H8_300
+      doc: Renesas (formerly Hitachi) H8/300
     47:
       id: h8_300h
-      doc: Hitachi H8/300H
+      -orig-id: EM_H8_300H
+      doc: Renesas (formerly Hitachi) H8/300H
     48:
       id: h8s
-      doc: Hitachi H8S
+      -orig-id: EM_H8S
+      doc: Renesas (formerly Hitachi) H8S
     49:
       id: h8_500
-      doc: Hitachi H8/500
+      -orig-id: EM_H8_500
+      doc: Renesas (formerly Hitachi) H8/500
     50:
       id: ia_64
+      -orig-id: EM_IA_64
       doc: Intel IA-64 processor architecture
     51:
       id: mips_x
+      -orig-id: EM_MIPS_X
       doc: Stanford MIPS-X
     52:
       id: coldfire
+      -orig-id: EM_COLDFIRE
       doc: Motorola ColdFire
     53:
       id: m68hc12
@@ -1111,204 +1188,276 @@ enums:
       doc: Motorola M68HC12
     54:
       id: mma
+      -orig-id: EM_MMA
       doc: Fujitsu MMA Multimedia Accelerator
     55:
       id: pcp
+      -orig-id: EM_PCP
       doc: Siemens PCP
     56:
       id: ncpu
+      -orig-id: EM_NCPU
       doc: Sony nCPU embedded RISC processor
     57:
       id: ndr1
+      -orig-id: EM_NDR1
       doc: Denso NDR1 microprocessor
     58:
       id: starcore
+      -orig-id: EM_STARCORE
       doc: Motorola Star*Core processor
     59:
       id: me16
+      -orig-id: EM_ME16
       doc: Toyota ME16 processor
     60:
       id: st100
+      -orig-id: EM_ST100
       doc: STMicroelectronics ST100 processor
     61:
       id: tinyj
+      -orig-id: EM_TINYJ
       doc: Advanced Logic Corp. TinyJ embedded processor family
     62:
       id: x86_64
+      -orig-id: EM_X86_64
       doc: AMD x86-64 architecture
     63:
       id: pdsp
+      -orig-id: EM_PDSP
       doc: Sony DSP Processor
     64:
       id: pdp10
+      -orig-id: EM_PDP10
       doc: Digital Equipment Corp. PDP-10
     65:
       id: pdp11
+      -orig-id: EM_PDP11
       doc: Digital Equipment Corp. PDP-11
     66:
       id: fx66
+      -orig-id: EM_FX66
       doc: Siemens FX66 microcontroller
     67:
       id: st9plus
+      -orig-id: EM_ST9PLUS
       doc: STMicroelectronics ST9+ 8/16 bit microcontroller
     68:
       id: st7
+      -orig-id: EM_ST7
       doc: STMicroelectronics ST7 8-bit microcontroller
     69:
-      id: mc68hc16
+      id: m68hc16
       -orig-id: EM_68HC16
       doc: Motorola MC68HC16 microcontroller
     70:
-      id: mc68hc11
+      id: m68hc11
       -orig-id: EM_68HC11
       doc: Motorola MC68HC11 microcontroller
     71:
-      id: mc68hc08
+      id: m68hc08
       -orig-id: EM_68HC08
       doc: Motorola MC68HC08 microcontroller
     72:
-      id: mc68hc05
+      id: m68hc05
       -orig-id: EM_68HC05
       doc: Motorola MC68HC05 microcontroller
     73:
       id: svx
+      -orig-id: EM_SVX
       doc: Silicon Graphics SVx
     74:
       id: st19
+      -orig-id: EM_ST19
       doc: STMicroelectronics ST19 8-bit microcontroller
     75:
       id: vax
+      -orig-id: EM_VAX
       doc: Digital VAX
     76:
       id: cris
+      -orig-id: EM_CRIS
       doc: Axis Communications 32-bit embedded processor
     77:
       id: javelin
+      -orig-id: EM_JAVELIN
       doc: Infineon Technologies 32-bit embedded processor
     78:
       id: firepath
+      -orig-id: EM_FIREPATH
       doc: Element 14 64-bit DSP Processor
     79:
       id: zsp
+      -orig-id: EM_ZSP
       doc: LSI Logic 16-bit DSP Processor
     80:
       id: mmix
+      -orig-id: EM_MMIX
       doc: Donald Knuth's educational 64-bit processor
     81:
       id: huany
+      -orig-id: EM_HUANY
       doc: Harvard University machine-independent object files
     82:
       id: prism
+      -orig-id: EM_PRISM
       doc: SiTera Prism
     83:
       id: avr
+      -orig-id: EM_AVR
       doc: Atmel AVR 8-bit microcontroller
     84:
       id: fr30
+      -orig-id: EM_FR30
       doc: Fujitsu FR30
     85:
       id: d10v
+      -orig-id: EM_D10V
       doc: Mitsubishi D10V
     86:
       id: d30v
+      -orig-id: EM_D30V
       doc: Mitsubishi D30V
     87:
       id: v850
-      doc: NEC v850
+      -orig-id: EM_V850
+      doc: Renesas V850 (formerly NEC V850)
     88:
       id: m32r
-      doc: Mitsubishi M32R
+      -orig-id: EM_M32R
+      doc: Renesas M32R (formerly Mitsubishi M32R)
     89:
       id: mn10300
-      doc: Matsushita MN10300
+      -orig-id: EM_MN10300
+      doc: Panasonic MN10300 (formerly Matsushita MN10300)
     90:
       id: mn10200
-      doc: Matsushita MN10200
+      -orig-id: EM_MN10200
+      doc: Panasonic MN10200 (formerly Matsushita MN10200)
     91:
       id: picojava
       -orig-id: EM_PJ
       doc: picoJava
     92:
-      id: openrisc
-      doc: OpenRISC 32-bit embedded processor
+      id: or1k
+      -orig-id:
+        - EM_OR1K
+        - EM_OPENRISC # Old constant that might be in use by some software.
+      doc: OpenRISC 1000 32-bit embedded processor
+      doc-ref:
+        - https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l205
+        - https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l455
     93:
       id: arc_compact
-      doc: 'ARC International ARCompact processor (old spelling/synonym: EM_ARC_A5)'
+      -orig-id:
+        - EM_ARC_COMPACT
+        - EM_ARC_A5 # old spelling/synonym
+      doc: ARC International ARCompact processor
     94:
       id: xtensa
-      doc: Tensilica Xtensa Architecture
+      -orig-id: EM_XTENSA
+      doc: Tensilica Xtensa architecture
     95:
       id: videocore
+      -orig-id:
+        - EM_VIDEOCORE
+        - EM_SCORE_OLD # Old Sunplus S+core7 backend magic number.
       doc: Alphamosaic VideoCore processor
     96:
       id: tmm_gpp
+      -orig-id: EM_TMM_GPP
       doc: Thompson Multimedia General Purpose Processor
     97:
       id: ns32k
+      -orig-id: EM_NS32K
       doc: National Semiconductor 32000 series
     98:
       id: tpc
+      -orig-id: EM_TPC
       doc: Tenor Network TPC processor
     99:
       id: snp1k
+      -orig-id:
+        - EM_SNP1K
+        - EM_PJ_OLD # Old value for picoJava. Deprecated.
       doc: Trebia SNP 1000 processor
     100:
       id: st200
-      doc: STMicroelectronics ST200
+      -orig-id: EM_ST200
+      doc: STMicroelectronics ST200 microcontroller
     101:
       id: ip2k
+      -orig-id: EM_IP2K
       doc: Ubicom IP2xxx microcontroller family
     102:
       id: max
+      -orig-id: EM_MAX
       doc: MAX processor
     103:
-      id: compact_risc
+      id: cr
       -orig-id: EM_CR
       doc: National Semiconductor CompactRISC microprocessor
     104:
       id: f2mc16
+      -orig-id: EM_F2MC16
       doc: Fujitsu F2MC16
     105:
       id: msp430
+      -orig-id: EM_MSP430
       doc: Texas Instruments embedded microcontroller MSP430
     106:
       id: blackfin
-      doc: Analog Devices Blackfin (DSP) processor
+      -orig-id: EM_BLACKFIN
+      doc: Analog Devices, Inc. (ADI) Blackfin
     107:
       id: se_c33
+      -orig-id: EM_SE_C33
       doc: Seiko Epson S1C33 family
     108:
       id: sep
+      -orig-id: EM_SEP
       doc: Sharp embedded microprocessor
     109:
       id: arca
+      -orig-id: EM_ARCA
       doc: Arca RISC microprocessor
     110:
       id: unicore
-      doc: microprocessor series from PKU-Unity Ltd. and MPRC of Peking University
+      -orig-id: EM_UNICORE
+      doc: Microprocessor series from PKU-Unity Ltd. and MPRC of Peking University
     111:
       id: excess
+      -orig-id: EM_EXCESS
       doc: 'eXcess: 16/32/64-bit configurable embedded CPU'
     112:
       id: dxp
+      -orig-id: EM_DXP
       doc: Icera Semiconductor Inc. Deep Execution Processor
     113:
       id: altera_nios2
+      -orig-id: EM_ALTERA_NIOS2
       doc: Altera Nios II soft-core processor
     114:
       id: crx
+      -orig-id: EM_CRX
       doc: National Semiconductor CompactRISC CRX microprocessor
     115:
       id: xgate
+      -orig-id:
+        - EM_XGATE
+        - EM_CR16_OLD # Old, value for National Semiconductor CompactRISC. Deprecated.
       doc: Motorola XGATE embedded processor
     116:
       id: c166
+      -orig-id: EM_C166
       doc: Infineon C16x/XC16x processor
     117:
       id: m16c
+      -orig-id: EM_M16C
       doc: Renesas M16C series microprocessors
     118:
       id: dspic30f
+      -orig-id: EM_DSPIC30F
       doc: Microchip Technology dsPIC30F Digital Signal Controller
     119:
       id: freescale_ce
@@ -1316,343 +1465,499 @@ enums:
       doc: Freescale Communication Engine RISC core
     120:
       id: m32c
+      -orig-id: EM_M32C
       doc: Renesas M32C series microprocessors
     131:
       id: tsk3000
+      -orig-id: EM_TSK3000
       doc: Altium TSK3000 core
     132:
       id: rs08
+      -orig-id: EM_RS08
       doc: Freescale RS08 embedded processor
     133:
       id: sharc
-      doc: Analog Devices SHARC family of 32-bit DSP processors
+      -orig-id: EM_SHARC
+      doc: Analog Devices, Inc. (ADI) SHARC family of 32-bit DSP processors
     134:
       id: ecog2
+      -orig-id: EM_ECOG2
       doc: Cyan Technology eCOG2 microprocessor
     135:
       id: score7
+      -orig-id:
+        - EM_SCORE7
+        - EM_SCORE
       doc: Sunplus S+core7 RISC processor
     136:
       id: dsp24
+      -orig-id: EM_DSP24
       doc: New Japan Radio (NJR) 24-bit DSP Processor
     137:
       id: videocore3
+      -orig-id: EM_VIDEOCORE3
       doc: Broadcom VideoCore III processor
     138:
       id: latticemico32
+      -orig-id: EM_LATTICEMICO32
       doc: RISC processor for Lattice FPGA architecture
     139:
       id: se_c17
+      -orig-id: EM_SE_C17
       doc: Seiko Epson C17 family
     140:
       id: ti_c6000
+      -orig-id: EM_TI_C6000
       doc: Texas Instruments TMS320C6000 DSP family
     141:
       id: ti_c2000
+      -orig-id: EM_TI_C2000
       doc: Texas Instruments TMS320C2000 DSP family
     142:
       id: ti_c5500
+      -orig-id: EM_TI_C5500
       doc: Texas Instruments TMS320C55x DSP family
     143:
       id: ti_arp32
+      -orig-id: EM_TI_ARP32
       doc: Texas Instruments Application Specific RISC Processor, 32bit fetch
     144:
       id: ti_pru
+      -orig-id: EM_TI_PRU
       doc: Texas Instruments Programmable Realtime Unit
     160:
       id: mmdsp_plus
+      -orig-id: EM_MMDSP_PLUS
       doc: STMicroelectronics 64bit VLIW Data Signal Processor
     161:
       id: cypress_m8c
+      -orig-id: EM_CYPRESS_M8C
       doc: Cypress M8C microprocessor
     162:
       id: r32c
+      -orig-id: EM_R32C
       doc: Renesas R32C series microprocessors
     163:
       id: trimedia
+      -orig-id: EM_TRIMEDIA
       doc: NXP Semiconductors TriMedia architecture family
     164:
       id: qdsp6
-      doc: Qualcomm Hexagon processor
+      -orig-id:
+        - EM_QDSP6
+        - EM_HEXAGON # https://github.com/torvalds/linux/blob/8cd9520d35a6c38db6567e97dd93b1f11f185dc6/include/uapi/linux/elf-em.h#L43 (Git tag "v7.1")
+      doc: Qualcomm Hexagon (QDSP6) processor
     165:
       id: i8051
       -orig-id: EM_8051
       doc: Intel 8051 and variants
     166:
       id: stxp7x
+      -orig-id: EM_STXP7X
       doc: STMicroelectronics STxP7x family of configurable and extensible RISC processors
     167:
       id: nds32
+      -orig-id: EM_NDS32
       doc: Andes Technology compact code size embedded RISC processor family
     168:
       id: ecog1x
+      -orig-id:
+        - EM_ECOG1X
+        - EM_ECOG1
       doc: Cyan Technology eCOG1X family
     169:
       id: maxq30
+      -orig-id: EM_MAXQ30
       doc: Dallas Semiconductor MAXQ30 Core Micro-controllers
     170:
       id: ximo16
+      -orig-id: EM_XIMO16
       doc: New Japan Radio (NJR) 16-bit DSP Processor
     171:
       id: manik
+      -orig-id: EM_MANIK
       doc: M2000 Reconfigurable RISC Microprocessor
     172:
-      id: craynv2
+      id: cray_nv2
+      -orig-id: EM_CRAYNV2
       doc: Cray Inc. NV2 vector architecture
     173:
       id: rx
+      -orig-id: EM_RX
       doc: Renesas RX family
     174:
       id: metag
+      -orig-id: EM_METAG
       doc: Imagination Technologies META processor architecture
     175:
       id: mcst_elbrus
+      -orig-id: EM_MCST_ELBRUS
       doc: MCST Elbrus general purpose hardware architecture
     176:
       id: ecog16
+      -orig-id: EM_ECOG16
       doc: Cyan Technology eCOG16 family
     177:
       id: cr16
+      -orig-id: EM_CR16
       doc: National Semiconductor CompactRISC CR16 16-bit microprocessor
     178:
       id: etpu
+      -orig-id: EM_ETPU
       doc: Freescale Extended Time Processing Unit
     179:
       id: sle9x
+      -orig-id: EM_SLE9X
       doc: Infineon Technologies SLE9X core
     180:
-      id: l10m
-      doc: Intel L10M
+      id: l1om
+      -orig-id:
+        - EM_L1OM
+        - EM_L10M
+      doc: Intel L1OM
     181:
-      id: k10m
-      doc: Intel K10M
+      id: k1om
+      -orig-id:
+        - EM_K1OM
+        - EM_K10M
+      doc: Intel K1OM
+    182:
+      id: intel182
+      -orig-id: EM_INTEL182
+      doc: Reserved by Intel
     183:
       id: aarch64
-      doc: ARM AArch64
+      -orig-id: EM_AARCH64
+      doc: ARM 64-bit architecture
+    184:
+      id: arm184
+      -orig-id: EM_ARM184
+      doc: Reserved by ARM
     185:
       id: avr32
+      -orig-id: EM_AVR32
       doc: Atmel Corporation 32-bit microprocessor family
     186:
       id: stm8
+      -orig-id: EM_STM8
       doc: STMicroeletronics STM8 8-bit microcontroller
     187:
       id: tile64
+      -orig-id: EM_TILE64
       doc: Tilera TILE64 multicore architecture family
     188:
       id: tilepro
+      -orig-id: EM_TILEPRO
       doc: Tilera TILEPro multicore architecture family
     189:
       id: microblaze
+      -orig-id: EM_MICROBLAZE
       doc: Xilinx MicroBlaze 32-bit RISC soft processor core
     190:
       id: cuda
+      -orig-id: EM_CUDA
       doc: NVIDIA CUDA architecture
     191:
       id: tilegx
+      -orig-id: EM_TILEGX
       doc: Tilera TILE-Gx multicore architecture family
     192:
       id: cloudshield
+      -orig-id: EM_CLOUDSHIELD
       doc: CloudShield architecture family
     193:
       id: corea_1st
+      -orig-id: EM_COREA_1ST
       doc: KIPO-KAIST Core-A 1st generation processor family
     194:
       id: corea_2nd
+      -orig-id: EM_COREA_2ND
       doc: KIPO-KAIST Core-A 2nd generation processor family
     195:
-      id: arcv2
-      doc: Synopsys ARCv2 ISA
+      id: arc_compact2
+      -orig-id:
+        - EM_ARC_COMPACT2
+        - EM_ARCV2
+      doc: Synopsys ARCompact V2 (ARCv2)
     196:
       id: open8
+      -orig-id: EM_OPEN8
       doc: Open8 8-bit RISC soft processor core
     197:
       id: rl78
+      -orig-id: EM_RL78
       doc: Renesas RL78 family
     198:
       id: videocore5
+      -orig-id: EM_VIDEOCORE5
       doc: Broadcom VideoCore V processor
     199:
-      id: renesas_78kor
-      -orig-id: EM_78KOR
-      doc: Renesas 78KOR family
+      id: renesas_78k0r
+      -orig-id:
+        - EM_78K0R
+        - EM_78KOR
+      doc: Renesas 78K0R family
     200:
       id: freescale_56800ex
       -orig-id: EM_56800EX
       doc: Freescale 56800EX Digital Signal Controller (DSC)
     201:
       id: ba1
+      -orig-id: EM_BA1
       doc: Beyond BA1 CPU architecture
     202:
       id: ba2
+      -orig-id: EM_BA2
       doc: Beyond BA2 CPU architecture
     203:
       id: xcore
+      -orig-id: EM_XCORE
       doc: XMOS xCORE processor family
     204:
       id: mchp_pic
+      -orig-id: EM_MCHP_PIC
       doc: Microchip 8-bit PIC(r) family
     205:
       id: intelgt
+      -orig-id:
+        - EM_INTELGT
+        - EM_INTEL205
       doc: Intel Graphics Technology
-      doc-ref: https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;hb=0f62fe0532#l339
+      doc-ref: https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l339
     206:
       id: intel206
+      -orig-id: EM_INTEL206
       doc: Reserved by Intel
     207:
       id: intel207
+      -orig-id: EM_INTEL207
       doc: Reserved by Intel
     208:
       id: intel208
+      -orig-id: EM_INTEL208
       doc: Reserved by Intel
     209:
       id: intel209
+      -orig-id: EM_INTEL209
       doc: Reserved by Intel
     210:
       id: km32
+      -orig-id: EM_KM32
       doc: KM211 KM32 32-bit processor
     211:
       id: kmx32
+      -orig-id: EM_KMX32
       doc: KM211 KMX32 32-bit processor
     212:
       id: kmx16
-      -orig-id: EM_EMX16
+      -orig-id:
+        - EM_KMX16
+        - EM_EMX16
       doc: KM211 KMX16 16-bit processor
     213:
       id: kmx8
-      -orig-id: EM_EMX8
+      -orig-id:
+        - EM_KMX8
+        - EM_EMX8
       doc: KM211 KMX8 8-bit processor
     214:
       id: kvarc
+      -orig-id: EM_KVARC
       doc: KM211 KVARC processor
     215:
       id: cdp
+      -orig-id: EM_CDP
       doc: Paneve CDP architecture family
     216:
       id: coge
+      -orig-id: EM_COGE
       doc: Cognitive Smart Memory Processor
     217:
       id: cool
+      -orig-id: EM_COOL
       doc: Bluechip Systems CoolEngine
     218:
       id: norc
+      -orig-id: EM_NORC
       doc: Nanoradio Optimized RISC
     219:
       id: csr_kalimba
+      -orig-id: EM_CSR_KALIMBA
       doc: CSR Kalimba architecture family
     220:
       id: z80
+      -orig-id: EM_Z80
       doc: Zilog Z80
     221:
       id: visium
-      doc: Controls and Data Services VISIUMcore
+      -orig-id: EM_VISIUM
+      doc: Controls and Data Services VISIUMcore processor
     222:
       id: ft32
-      doc: FTDI Chip FT32
+      -orig-id: EM_FT32
+      doc: FTDI Chip FT32 high performance 32-bit RISC architecture
     223:
       id: moxie
-      doc: Moxie processor
+      -orig-id: EM_MOXIE
+      doc: Moxie processor family
     224:
-      id: amd_gpu
+      id: amdgpu
       -orig-id: EM_AMDGPU
       doc: AMD GPU architecture
     243:
       id: riscv
+      -orig-id: EM_RISCV
       doc: RISC-V
     244:
       id: lanai
+      -orig-id: EM_LANAI
       doc: Lanai 32-bit processor
-      doc-ref: https://github.com/llvm/llvm-project/blob/f6928cf45516/llvm/include/llvm/BinaryFormat/ELF.h#L319
     245:
       id: ceva
+      -orig-id: EM_CEVA
       doc: CEVA Processor Architecture Family
-      doc-ref: https://groups.google.com/g/generic-abi/c/cmq1LFFpWqU
     246:
       id: ceva_x2
+      -orig-id: EM_CEVA_X2
       doc: CEVA X2 Processor Family
-      doc-ref: https://groups.google.com/g/generic-abi/c/cmq1LFFpWqU
     247:
       id: bpf
+      -orig-id: EM_BPF
       doc: Linux BPF - in-kernel virtual machine
     248:
       id: graphcore_ipu
+      -orig-id: EM_GRAPHCORE_IPU
       doc: Graphcore Intelligent Processing Unit
-      doc-ref: https://groups.google.com/g/generic-abi/c/cmq1LFFpWqU
     249:
       id: img1
+      -orig-id: EM_IMG1
       doc: Imagination Technologies
-      doc-ref: https://groups.google.com/g/generic-abi/c/cmq1LFFpWqU
     250:
       id: nfp
+      -orig-id: EM_NFP
       doc: Netronome Flow Processor (NFP)
-      doc-ref: https://groups.google.com/g/generic-abi/c/cmq1LFFpWqU
     251:
       id: ve
+      -orig-id: EM_VE
       doc: NEC SX-Aurora Vector Engine (VE) processor
-      doc-ref: https://github.com/llvm/llvm-project/blob/f6928cf45516/llvm/include/llvm/BinaryFormat/ELF.h#L321
     252:
       id: csky
-      doc: C-SKY 32-bit processor
+      -orig-id: EM_CSKY
+      doc: C-SKY 32-bit processor family
     253:
       id: arc_compact3_64
-      -orig-id: EM_ARC_COMPACT3_64
-      doc: Synopsys ARCv3 64-bit ISA/HS6x cores
-      doc-ref:
-        - https://gitlab.com/gnutools/binutils-gdb/-/blob/4ffb22ec40/include/elf/common.h#L350
-        - https://github.com/file/file/blob/9b2538d/magic/Magdir/elf#L301
-        - https://bugs.astron.com/view.php?id=251
+      -orig-id:
+        - EM_ARC_COMPACT3_64
+        - EM_ARCV3
+      doc: |
+        Synopsys ARCv3 64-bit.
+
+        Note: in the [official
+        registry](https://gabi.xinuos.com/v42/elf/a-emachine.html), this is
+        labeled "Synopsys ARCv2.3 64-bit". Nearly all implementations of the ELF
+        format have adopted this description verbatim without verification.
+        However, it seems that there is no such thing as "ARCv2.3". The only
+        correct and official name from Synopsys is "ARCv3" - see the
+        [ARCv3 ELF ABI specification](https://github.com/foss-for-synopsys-dwc-arc-processors/arc-ABI-manual/blob/8db91b9b7b92222cfb8972293b6d714ee2959248/arcv3-elf.md#-file-header):
+
+        > * e_machine: Identifies the machine this ELF file targets. Always
+        >   contains:
+        >   * EM_ARC_COMPACT3_64 (253 - 0xfd) for Synopsys ARCv3 64-bit
+        >   * EM_ARC_COMPACT3 (255 - 0xff) for Synopsys ARCv3 32-bit
+
+        One of the few projects that recognized and fixed this error is the
+        `file` command, see
+        <https://github.com/file/file/commit/70200102a0be50d409dca5ef76d9cbc3703a0753>
     254:
       id: mcs6502
+      -orig-id: EM_MCS6502
       doc: MOS Technology MCS 6502 processor
-      doc-ref: https://gitlab.com/gnutools/binutils-gdb/-/blob/4ffb22ec40/include/elf/common.h#L351
     255:
       id: arc_compact3
-      -orig-id: EM_ARC_COMPACT3
-      doc: Synopsys ARCv3 32-bit
-      doc-ref:
-        - https://gitlab.com/gnutools/binutils-gdb/-/blob/4ffb22ec40/include/elf/common.h#L352
-        - https://github.com/file/file/blob/9b2538d/magic/Magdir/elf#L303
-        - https://bugs.astron.com/view.php?id=251
+      -orig-id:
+        - EM_ARC_COMPACT3
+        - EM_ARCV3_32
+      doc: |
+        Synopsys ARCv3 32-bit.
+
+        Note: in the [official
+        registry](https://gabi.xinuos.com/v42/elf/a-emachine.html), this is
+        labeled "Synopsys ARCv2.3 32-bit". Nearly all implementations of the ELF
+        format have adopted this description verbatim without verification.
+        However, it seems that there is no such thing as "ARCv2.3". The only
+        correct and official name from Synopsys is "ARCv3" - see the
+        [ARCv3 ELF ABI specification](https://github.com/foss-for-synopsys-dwc-arc-processors/arc-ABI-manual/blob/8db91b9b7b92222cfb8972293b6d714ee2959248/arcv3-elf.md#-file-header):
+
+        > * e_machine: Identifies the machine this ELF file targets. Always
+        >   contains:
+        >   * EM_ARC_COMPACT3_64 (253 - 0xfd) for Synopsys ARCv3 64-bit
+        >   * EM_ARC_COMPACT3 (255 - 0xff) for Synopsys ARCv3 32-bit
+
+        One of the few projects that recognized and fixed this error is the
+        `file` command, see
+        <https://github.com/file/file/commit/70200102a0be50d409dca5ef76d9cbc3703a0753>.
     256:
       id: kvx
+      -orig-id: EM_KVX
       doc: Kalray VLIW core of the MPPA processor family
-      doc-ref: https://gitlab.com/gnutools/binutils-gdb/-/blob/4ffb22ec40/include/elf/common.h#L353
     257:
-      id: wdc65816
+      id: wdc_65816
       -orig-id: EM_65816
       doc: WDC 65816/65C816
-      doc-ref: https://gitlab.com/gnutools/binutils-gdb/-/blob/4ffb22ec40/include/elf/common.h#L354
     258:
       id: loongarch
       -orig-id: EM_LOONGARCH
       doc: LoongArch
-      doc-ref: https://gitlab.com/gnutools/binutils-gdb/-/blob/4ffb22ec40/include/elf/common.h#L355
     259:
       id: kf32
       -orig-id: EM_KF32
       doc: ChipON KungFu32
-      doc-ref:
-        - https://gitlab.com/gnutools/binutils-gdb/-/blob/4ffb22ec40/include/elf/common.h#L356
-        - https://groups.google.com/g/generic-abi/c/n8tLQxj02YY
     260:
       id: u16_u8core
       -orig-id: EM_U16_U8CORE
       doc: LAPIS nX-U16/U8
-      doc-ref:
-        - https://gitlab.com/gnutools/binutils-gdb/-/blob/dfbcbf85ea/include/elf/common.h#L357
     261:
       id: tachyum
       -orig-id: EM_TACHYUM
       doc: Tachyum
-      doc-ref:
-        - https://gitlab.com/gnutools/binutils-gdb/-/blob/dfbcbf85ea/include/elf/common.h#L358
     262:
       id: nxp_56800ef
       -orig-id: EM_56800EF
       doc: NXP 56800EF Digital Signal Controller (DSC)
-      doc-ref:
-        - https://gitlab.com/gnutools/binutils-gdb/-/blob/dfbcbf85ea/include/elf/common.h#L359
+    263:
+      id: sbf
+      -orig-id: EM_SBF
+      doc: Solana Bytecode Format
+    264:
+      id: ai_engine
+      -orig-id: EM_AIENGINE
+      doc: AMD/Xilinx AI Engine architecture
+    265:
+      id: sima_mla
+      -orig-id: EM_SIMA_MLA
+      doc: SiMa MLA
+    266:
+      id: bang
+      -orig-id: EM_BANG
+      doc: Cambricon BANG
+    267:
+      id: loonggpu
+      -orig-id: EM_LOONGGPU
+      doc: Loongson LoongGPU
+    268:
+      id: sw64
+      -orig-id: EM_SW64
+      doc: Wuxi Institute of Advanced Technology SW64
+    269:
+      id: ai_engine_ctrlcode
+      -orig-id: EM_AIECTRLCODE
+      doc: AMD/Xilinx AI Engine ctrlcode
+    270:
+      id: ppu
+      -orig-id: EM_PPU
+      doc: T-Head PPU
+      doc-ref: https://groups.google.com/g/generic-abi/c/XKECxlRDvu8
     # unofficial values
-    # https://gitlab.com/gnutools/binutils-gdb/-/blob/4ffb22ec40/include/elf/common.h#L358
     0x1057:
       id: avr_old
       -orig-id: EM_AVR_OLD
@@ -1662,7 +1967,7 @@ enums:
     0x1223:
       id: adapteva_epiphany
       -orig-id: EM_ADAPTEVA_EPIPHANY
-      doc: Adapteva's Epiphany architecture.
+      doc: Adapteva's Epiphany architecture
     0x2530:
       id: mt
       -orig-id: EM_MT
@@ -1673,7 +1978,7 @@ enums:
     0x4157:
       id: webassembly
       -orig-id: EM_WEBASSEMBLY
-      doc: Unofficial value for Web Assembly binaries, as used by LLVM.
+      doc: Unofficial value for WebAssembly (Wasm) binaries, as used by LLVM.
     0x4688:
       id: xc16x
       -orig-id: EM_XC16X
@@ -1681,10 +1986,12 @@ enums:
     0x4def:
       id: s12z
       -orig-id: EM_S12Z
-      doc: The Freescale toolchain generates elf files with this value.
+      doc: Freescale S12Z. The Freescale toolchain generates ELF files with this value.
     0x5441:
       id: cygnus_frv
-      -orig-id: EM_CYGNUS_FRV
+      -orig-id:
+        - EM_CYGNUS_FRV
+        - EM_FRV # "Fujitsu FR-V" in the Linux kernel: https://github.com/torvalds/linux/blob/8cd9520d35a6c38db6567e97dd93b1f11f185dc6/include/uapi/linux/elf-em.h#L55 (Git tag "v7.1")
     0x5aa5:
       id: dlx
       -orig-id: EM_DLX
@@ -1698,15 +2005,24 @@ enums:
     0x8217:
       id: ip2k_old
       -orig-id: EM_IP2K_OLD
+      doc: Ubicom IP2xxx (old)
     0x9025:
       id: cygnus_powerpc
       -orig-id: EM_CYGNUS_POWERPC
+      doc: Cygnus PowerPC
     0x9026:
       id: alpha
       -orig-id: EM_ALPHA
     0x9041:
       id: cygnus_m32r
       -orig-id: EM_CYGNUS_M32R
+      doc: |
+        Cygnus M32R.
+
+        According to the Linux kernel (Git tag "v7.1") -
+        <https://github.com/torvalds/linux/blob/8cd9520d35a6c38db6567e97dd93b1f11f185dc6/include/uapi/linux/elf-em.h#L63>:
+
+        > Bogus old m32r magic number, used by old tools.
     0x9080:
       id: cygnus_v850
       -orig-id: EM_CYGNUS_V850
@@ -1716,12 +2032,14 @@ enums:
     0xabc7:
       id: xtensa_old
       -orig-id: EM_XTENSA_OLD
+      doc: Old, unofficial value for Xtensa
     0xad45:
       id: xstormy16
       -orig-id: EM_XSTORMY16
     0xbaab:
       id: microblaze_old
       -orig-id: EM_MICROBLAZE_OLD
+      doc: Old MicroBlaze
     0xbeef:
       id: cygnus_mn10300
       -orig-id: EM_CYGNUS_MN10300
