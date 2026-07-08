@@ -92,6 +92,7 @@ doc: |
 
     * <https://philip.html5.org/tests/apng/tests.html>
     * <http://littlesvr.ca/apng/>
+doc-ref: https://www.w3.org/TR/png/
 seq:
   # https://www.w3.org/TR/png/#5PNG-file-signature
   - id: magic
