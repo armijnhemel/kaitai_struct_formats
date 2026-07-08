@@ -26,7 +26,7 @@ meta:
       - Q178051 # PNG
       - Q433224 # APNG
   license: CC0-1.0
-  ks-version: 0.11
+  ks-version: '0.11'
   imports:
     - icc_4
     - exif
