@@ -27,7 +27,7 @@ doc-ref:
   - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/elf-application-binary-interface.html
 seq:
   - id: magic
-    -orig-id: e_ident[EI_MAG0]..e_ident[EI_MAG3]
+    -orig-id: e_ident[EI_MAG0..EI_MAG3]
     size: 4
     contents: [0x7f, "ELF"]
     doc: File identification, must be 0x7f + "ELF".
@@ -63,7 +63,7 @@ seq:
       Version of ABI targeted by this ELF file. Interpretation
       depends on `abi` attribute.
   - id: pad
-    -orig-id: e_ident[EI_PAD]..e_ident[EI_NIDENT - 1]
+    -orig-id: e_ident[EI_PAD..EI_NIDENT - 1]
     contents: [0, 0, 0, 0, 0, 0, 0]
   - id: header
     type: endian_elf
@@ -375,101 +375,103 @@ types:
           in-enum: true
       - id: e_version
         type: u4
-      # e_entry
       - id: entry_point
+        -orig-id: e_entry
         type:
           switch-on: _root.bits
           cases:
             'bits::b32': u4
             'bits::b64': u8
-      # e_phoff
       - id: ofs_program_headers
+        -orig-id: e_phoff
         type:
           switch-on: _root.bits
           cases:
             'bits::b32': u4
             'bits::b64': u8
-      # e_shoff
       - id: ofs_section_headers
+        -orig-id: e_shoff
         type:
           switch-on: _root.bits
           cases:
             'bits::b32': u4
             'bits::b64': u8
-      # e_flags
       - id: flags
+        -orig-id: e_flags
         size: 4
-      # e_ehsize
       - id: e_ehsize
+        -orig-id: e_ehsize
         type: u2
-      # e_phentsize
       - id: program_header_size
+        -orig-id: e_phentsize
         type: u2
-      # e_phnum
       - id: num_program_headers
+        -orig-id: e_phnum
         type: u2
-      # e_shentsize
       - id: section_header_size
+        -orig-id: e_shentsize
         type: u2
-      # e_shnum
       - id: num_section_headers
+        -orig-id: e_shnum
         type: u2
-      # e_shstrndx
       - id: section_names_idx
+        -orig-id: e_shstrndx
         type: u2
     types:
-      # Elf(32|64)_Phdr
       program_header:
+        -orig-id:
+          - Elf32_Phdr
+          - Elf64_Phdr
         seq:
-          # p_type
           - id: type
+            -orig-id: p_type
             type: u4
             enum: ph_type
-          # p_flags
           - id: flags64
+            -orig-id: p_flags
             type: u4
             if: _root.bits == bits::b64
-          # p_offset
           - id: offset
+            -orig-id: p_offset
             type:
               switch-on: _root.bits
               cases:
                 'bits::b32': u4
                 'bits::b64': u8
-          # p_vaddr
           - id: vaddr
+            -orig-id: p_vaddr
             type:
               switch-on: _root.bits
               cases:
                 'bits::b32': u4
                 'bits::b64': u8
-          # p_paddr
           - id: paddr
+            -orig-id: p_paddr
             type:
               switch-on: _root.bits
               cases:
                 'bits::b32': u4
                 'bits::b64': u8
-          # p_filesz
           - id: filesz
+            -orig-id: p_filesz
             type:
               switch-on: _root.bits
               cases:
                 'bits::b32': u4
                 'bits::b64': u8
-          # p_memsz
           - id: memsz
+            -orig-id: p_memsz
             type:
               switch-on: _root.bits
               cases:
                 'bits::b32': u4
                 'bits::b64': u8
-          # p_flags
           - id: flags32
+            -orig-id: p_flags
             type: u4
             if: _root.bits == bits::b32
-          # p_align
           - id: align
+            -orig-id: p_align
             type:
               switch-on: _root.bits
               cases:
@@ -485,7 +487,9 @@ types:
             -webide-parse-mode: eager
         -webide-representation: "{type} - f:{flags_obj:flags} (o:{offset}, s:{filesz:dec})"
       section_header:
-        -orig-id: Elf(32|64)_Shdr
+        -orig-id:
+          - Elf32_Shdr
+          - Elf64_Shdr
         seq:
           - id: ofs_name
             -orig-id: sh_name
@@ -825,18 +829,22 @@ types:
           section_names_idx != section_header_idx_special::undefined.to_i
           and section_names_idx < _root.header.num_section_headers
 enums:
-  # EI_CLASS
+  # e_ident[EI_CLASS]
   bits:
-    # ELFCLASS32
-    1: b32
-    # ELFCLASS64
-    2: b64
-  # EI_DATA
+    1:
+      id: b32
+      -orig-id: ELFCLASS32
+    2:
+      id: b64
+      -orig-id: ELFCLASS64
+  # e_ident[EI_DATA]
   endian:
-    # ELFDATA2LSB
-    1: le
-    # ELFDATA2MSB
-    2: be
+    1:
+      id: le
+      -orig-id: ELFDATA2LSB
+    2:
+      id: be
+      -orig-id: ELFDATA2MSB
   # https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l60
   # https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l134
   # https://github.com/llvm/llvm-project/blob/ca7933e47d3a3451d81e72ac174dcb5aa28b59d1/llvm/include/llvm/BinaryFormat/ELF.h#L344 (Git tag "llvmorg-22.1.8")
@@ -965,16 +973,21 @@ enums:
       doc: Standalone (embedded) application
   # e_type
   obj_type:
-    # ET_NONE
-    0: no_file_type
-    # ET_REL
-    1: relocatable
-    # ET_EXEC
-    2: executable
-    # ET_DYN
-    3: shared
-    # ET_CORE
-    4: core
+    0:
+      id: no_file_type
+      -orig-id: ET_NONE
+    1:
+      id: relocatable
+      -orig-id: ET_REL
+    2:
+      id: executable
+      -orig-id: ET_EXEC
+    3:
+      id: shared
+      -orig-id: ET_DYN
+    4:
+      id: core
+      -orig-id: ET_CORE
   # https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l106
   # https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l169
   # https://gabi.xinuos.com/elf/a-emachine.html
