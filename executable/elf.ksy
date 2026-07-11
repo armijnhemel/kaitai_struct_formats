@@ -428,7 +428,7 @@ types:
         doc-ref:
           - https://gabi.xinuos.com/v42/elf/07-pheader.html#program-header-entry
           - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/program-header.html
-        -webide-representation: "{type} - f:{flags_obj:flags} (o:{offset}, s:{filesz:dec})"
+        -webide-representation: "{type} - f:{flags_obj:flags} (o:{ofs_body}, s:{len_body:dec})"
         seq:
           - id: type
             -orig-id: p_type
@@ -438,35 +438,35 @@ types:
             -orig-id: p_flags
             type: u4
             if: _root.bits == bits::b64
-          - id: offset
+          - id: ofs_body
             -orig-id: p_offset
             type:
               switch-on: _root.bits
               cases:
                 'bits::b32': u4
                 'bits::b64': u8
-          - id: vaddr
+          - id: virt_addr
             -orig-id: p_vaddr
             type:
               switch-on: _root.bits
               cases:
                 'bits::b32': u4
                 'bits::b64': u8
-          - id: paddr
+          - id: phys_addr
             -orig-id: p_paddr
             type:
               switch-on: _root.bits
               cases:
                 'bits::b32': u4
                 'bits::b64': u8
-          - id: filesz
+          - id: len_body
             -orig-id: p_filesz
             type:
               switch-on: _root.bits
               cases:
                 'bits::b32': u4
                 'bits::b64': u8
-          - id: memsz
+          - id: memory_size
             -orig-id: p_memsz
             type:
               switch-on: _root.bits
