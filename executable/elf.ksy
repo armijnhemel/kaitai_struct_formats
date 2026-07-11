@@ -499,7 +499,7 @@ types:
         doc-ref:
           - https://gabi.xinuos.com/v42/elf/03-sheader.html#section-header-table-entry
           - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/section-headers.html
-        -webide-representation: "{name} ({type}) - f:{flags_obj:flags} (o:{offset}, s:{size:dec})"
+        -webide-representation: "{name} ({type}) - f:{flags_obj:flags} (o:{ofs_body}, s:{len_body:dec})"
         seq:
           - id: ofs_name
             -orig-id: sh_name
