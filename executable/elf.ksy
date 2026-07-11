@@ -428,6 +428,7 @@ types:
         doc-ref:
           - https://gabi.xinuos.com/v42/elf/07-pheader.html#program-header-entry
           - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/program-header.html
+        -webide-representation: "{type} - f:{flags_obj:flags} (o:{offset}, s:{filesz:dec})"
         seq:
           - id: type
             -orig-id: p_type
@@ -491,7 +492,6 @@ types:
                 'bits::b32': phdr_type_flags(flags32)
                 'bits::b64': phdr_type_flags(flags64)
             -webide-parse-mode: eager
-        -webide-representation: "{type} - f:{flags_obj:flags} (o:{offset}, s:{filesz:dec})"
       section_header:
         -orig-id:
           - Elf32_Shdr
@@ -499,6 +499,7 @@ types:
         doc-ref:
           - https://gabi.xinuos.com/v42/elf/03-sheader.html#section-header-table-entry
           - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/section-headers.html
+        -webide-representation: "{name} ({type}) - f:{flags_obj:flags} (o:{offset}, s:{size:dec})"
         seq:
           - id: ofs_name
             -orig-id: sh_name
@@ -587,7 +588,6 @@ types:
           flags_obj:
             type: section_header_flags(flags)
             -webide-parse-mode: eager
-        -webide-representation: "{name} ({type}) - f:{flags_obj:flags} (o:{offset}, s:{size:dec})"
       strings_struct:
         seq:
           - id: entries
