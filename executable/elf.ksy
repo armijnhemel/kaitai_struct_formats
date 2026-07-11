@@ -364,6 +364,9 @@ types:
         cases:
           'endian::le': le
           'endian::be': be
+    doc-ref:
+      - https://gabi.xinuos.com/v42/elf/02-eheader.html
+      - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/elf-header.html
     seq:
       - id: e_type
         type: u2
@@ -422,6 +425,9 @@ types:
         -orig-id:
           - Elf32_Phdr
           - Elf64_Phdr
+        doc-ref:
+          - https://gabi.xinuos.com/v42/elf/07-pheader.html#program-header-entry
+          - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/program-header.html
         seq:
           - id: type
             -orig-id: p_type
@@ -490,6 +496,9 @@ types:
         -orig-id:
           - Elf32_Shdr
           - Elf64_Shdr
+        doc-ref:
+          - https://gabi.xinuos.com/v42/elf/03-sheader.html#section-header-table-entry
+          - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/section-headers.html
         seq:
           - id: ofs_name
             -orig-id: sh_name
@@ -588,6 +597,9 @@ types:
             # on the `name` attribute in the `dynsym_section_entry` type.
             encoding: UTF-8
       dynamic_section:
+        doc-ref:
+          - https://gabi.xinuos.com/v42/elf/08-dynamic.html#dynamic-section
+          - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/dynamic-section.html
         seq:
           - id: entries
             type: dynamic_section_entry
@@ -597,8 +609,8 @@ types:
             value: _parent.linked_section.type == sh_type::strtab
       dynamic_section_entry:
         doc-ref:
+          - https://gabi.xinuos.com/v42/elf/08-dynamic.html#dynamic-section
           - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/dynamic-section.html
-          - https://refspecs.linuxfoundation.org/elf/gabi4+/ch5.dynamic.html#dynamic_section
         -webide-representation: "{tag_enum}: {value_or_ptr} {value_str} {flag_1_values:flags}"
         seq:
           - id: tag
