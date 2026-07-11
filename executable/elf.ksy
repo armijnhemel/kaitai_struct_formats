@@ -2084,14 +2084,38 @@ enums:
   # https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l472
   # https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/program-header.html#GUID-49F99618-9CDC-4A08-A94C-E2AA264AA01A__CHAPTER6-69880
   ph_type:
-    0: null_type
-    1: load
-    2: dynamic
-    3: interp
-    4: note
-    5: shlib
-    6: phdr
-    7: tls
+    0:
+      id: null_type
+      -orig-id: PT_NULL
+      doc: Program header table entry unused
+    1:
+      id: load
+      -orig-id: PT_LOAD
+      doc: Loadable program segment
+    2:
+      id: dynamic
+      -orig-id: PT_DYNAMIC
+      doc: Dynamic linking information
+    3:
+      id: interp
+      -orig-id: PT_INTERP
+      doc: Program interpreter (i.e. runtime/dynamic linker)
+    4:
+      id: note
+      -orig-id: PT_NOTE
+      doc: Auxiliary information
+    5:
+      id: shlib
+      -orig-id: PT_SHLIB
+      doc: Reserved
+    6:
+      id: phdr
+      -orig-id: PT_PHDR
+      doc: Segment for the program header table itself
+    7:
+      id: tls
+      -orig-id: PT_TLS
+      doc: Thread-local storage segment
     # 0x60000000: lo_os
     0x6464e550:
       id: sunw_unwind
@@ -2104,19 +2128,27 @@ enums:
       -orig-id:
         - PT_GNU_EH_FRAME
         - PT_SUNW_EH_FRAME
+      doc: Exception unwind tables (`.eh_frame_hdr` section)
     0x6474e551:
       id: gnu_stack
       -orig-id: PT_GNU_STACK
+      doc: Indicates stack executability
     0x6474e552:
       id: gnu_relro
       -orig-id: PT_GNU_RELRO
+      doc: Read-only after relocation
     0x6474e553:
       id: gnu_property
       -orig-id: PT_GNU_PROPERTY
+      doc: Segment containing the `.note.gnu.property` section
     0x6474e554:
       id: gnu_sframe
       -orig-id: PT_GNU_SFRAME
-    0x65041580: pax_flags
+      doc: GNU SFrame stack trace segment (`.sframe` section)
+    0x65041580:
+      id: pax_flags
+      -orig-id: PT_PAX_FLAGS
+      doc: PaX flags
     # 0x6fffffff: hi_os
     # 0x70000000: lo_proc
     0x70000000:
