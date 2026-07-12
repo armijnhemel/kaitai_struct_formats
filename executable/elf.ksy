@@ -602,8 +602,10 @@ types:
           - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/dynamic-section.html
         seq:
           - id: entries
+            -orig-id: _DYNAMIC
             type: dynamic_section_entry
-            repeat: eos
+            repeat: until
+            repeat-until: _.tag_enum == dynamic_array_tags::null
         instances:
           is_string_table_linked:
             value: _parent.linked_section.type == sh_type::strtab
@@ -2377,7 +2379,10 @@ enums:
   # https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/dynamic-section.html#GUID-4336A69A-D905-4FCE-A398-80375A9E6464__CHAPTER6-TBL-52
   # https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;hb=0f62fe0532#l853
   dynamic_array_tags:
-    0: "null"            # Marks end of dynamic section
+    0:
+      id: "null"
+      -orig-id: DT_NULL
+      doc: Marks end of dynamic section
     1: needed            # Name of needed library
     2: pltrelsz          # Size in bytes of PLT relocs
     3: pltgot            # Processor defined value
