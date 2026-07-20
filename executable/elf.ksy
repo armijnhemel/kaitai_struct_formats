@@ -495,7 +495,19 @@ types:
                 'ph_type::interp': ph_interpreter
                 'ph_type::dynamic': ph_dynamic_section
                 'ph_type::note': note_section
-            if: type != ph_type::null_type
+            # This condition is necessary for successfully parsing ELF files
+            # embedded within `.gnu_debugdata` sections (see
+            # https://github.com/kaitai-io/kaitai_struct_formats/pull/752#discussion_r3571558218).
+            #
+            # These ELF files have all program headers and most section headers
+            # (except for a few, such as `.gnu_debugdata` itself) of the
+            # original (parent) ELF file, but the types of most sections have
+            # been changed to `sh_type::nobits` (`SHT_NOBITS`), and the
+            # `len_body` fields in many program headers have been zeroed,
+            # sometimes along with the `ofs_body` field. Expecting these program
+            # headers with `len_body == 0` to have a valid body would lead to
+            # parse errors.
+            if: len_body != 0
           flags_obj:
             type:
               switch-on: _root.bits
