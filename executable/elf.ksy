@@ -624,6 +624,7 @@ types:
                 'sh_type::note': note_section
                 'sh_type::rel': relocation_section(false)
                 'sh_type::rela': relocation_section(true)
+                'sh_type::gnu_versym': versym_section
             if: type != sh_type::nobits
           linked_section:
             value: _root.header.section_headers[linked_section_idx]
@@ -969,6 +970,62 @@ types:
                 'bits::b32': s4
                 'bits::b64': s8
             if: _parent.has_addend
+      versym_section:
+        doc: |
+          Symbol Version Table, contained in the special section named
+          `.gnu.version` with the section type `sh_type::gnu_versym`
+          (`SHT_GNU_versym`).
+
+          This section must have the same number of entries as the Dynamic
+          Symbol Table in the `.dynsym` section (section type `sh_type::dynsym`
+          / `SHT_DYNSYM`). Each entry specifies the version defined for or
+          required by the corresponding symbol in the Dynamic Symbol Table.
+        doc-ref: https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#SYMVERTBL
+        seq:
+          - id: entries
+            type: versym_section_entry
+            repeat: eos
+      versym_section_entry:
+        -orig-id:
+          - Elf32_Versym
+          - Elf64_Versym
+        doc-ref: https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#SYMVERTBL
+        -webide-representation: 'i:{version_index:dec}[={version_index_special}] h:{is_hidden}'
+        seq:
+          - id: value_raw
+            type: u2
+            doc: |
+              Raw value, don't read this field - access `version_index` and
+              `is_hidden` instead.
+        instances:
+          version_index:
+            -orig-id: VERSYM_VERSION
+            value: value_raw & 0x7fff
+            doc: |
+              Version reference for the corresponding symbol in the Dynamic
+              Symbol Table (`.dynsym` section).
+
+              The value itself is not the version: it's a key that is matched
+              against the `vd_ndx` member of the `Elfxx_Verdef` structure if the
+              symbol is defined in this object, or the `vna_other` member of the
+              `Elfxx_Vernaux` structure if the symbol is required from another
+              object. The "name" string of the matched entry specifies the
+              version of the symbol.
+
+              The values `version_index_special::local` (0) and
+              `version_index_special::global_symbol` (1) have special meanings.
+              The `version_index_special` value instance converts the integer
+              value to the `version_index_special` enum.
+          version_index_special:
+            value: version_index
+            enum: version_index_special
+          is_hidden:
+            -orig-id: VERSYM_HIDDEN
+            value: value_raw & 0x8000 != 0
+            doc: |
+              This bit is set if the symbol is hidden, and is only visible with
+              an explicit version number. This is a GNU extension.
+            doc-ref: https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l1379
 enums:
   # e_ident[EI_CLASS]
   bits:
@@ -2358,12 +2415,24 @@ enums:
     0x6ffffffa: sunw_move
     0x6ffffffb: sunw_comdat
     0x6ffffffc: sunw_syminfo
-    0x6ffffffd: sunw_verdef
-    # 0x6ffffffd: gnu_verdef
-    0x6ffffffe: sunw_verneed
-    # 0x6ffffffe: gnu_verneed
-    0x6fffffff: sunw_versym
-    # 0x6fffffff: gnu_versym
+    # 0x6ffffffd:
+    #   id: sunw_verdef
+    #   -orig-id: SHT_SUNW_verdef
+    0x6ffffffd:
+      id: gnu_verdef
+      -orig-id: SHT_GNU_verdef
+    # 0x6ffffffe:
+    #   id: sunw_verneed
+    #   -orig-id: SHT_SUNW_verneed
+    0x6ffffffe:
+      id: gnu_verneed
+      -orig-id: SHT_GNU_verneed
+    # 0x6fffffff:
+    #   id: sunw_versym
+    #   -orig-id: SHT_SUNW_versym
+    0x6fffffff:
+      id: gnu_versym
+      -orig-id: SHT_GNU_versym
     # 0x6fffffff: hi_sunw
     # 0x6fffffff: hi_os
     # 0x70000000: lo_proc
@@ -2381,6 +2450,33 @@ enums:
     # 0x7fffffff: hi_proc
     # 0x80000000: lo_user
     # 0xffffffff: hi_user
+  # Reserved values of a symbol version index - see the `versym_section` type.
+  #
+  # https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#SYMVERTBL
+  # https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l1088
+  # https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-symbol-section.html#GUID-DC6EBD6B-50B1-4197-A00B-A3CAE73FC9E4__CHAPTER6-TBL-32
+  version_index_special:
+    0:
+      id: local
+      -orig-id: VER_NDX_LOCAL
+      doc: The symbol is local, not available outside the object.
+    1:
+      id: global_symbol
+      -orig-id: VER_NDX_GLOBAL
+      -affected-by: 90
+      doc: |
+        The symbol is defined in this object and is globally available. It's
+        assigned to the base version definition. This value is used for
+        unversioned symbols.
+
+        As of KSC 0.9, this enum key can't be called `global` because it would
+        cause a syntax error in Python (it is a keyword).
+    # 0xff00: lo_reserve # Beginning of reserved entries.
+    0xff01:
+      id: eliminate
+      -orig-id: VER_NDX_ELIMINATE
+      doc: Symbol is to be eliminated.
+      doc-ref: https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l1092
   # https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/symbol-table-section.html#GUID-DBDD92CB-D58A-4CB5-861F-8868D8CB4552__CHAPTER7-27
   symbol_visibility:
     0: default
