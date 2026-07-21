@@ -420,6 +420,26 @@ types:
       - id: section_names_idx
         -orig-id: e_shstrndx
         type: u2
+    instances:
+      program_headers:
+        pos: ofs_program_headers
+        size: program_header_size
+        type: program_header
+        repeat: expr
+        repeat-expr: num_program_headers
+      section_headers:
+        pos: ofs_section_headers
+        size: section_header_size
+        type: section_header
+        repeat: expr
+        repeat-expr: num_section_headers
+      section_names:
+        pos: section_headers[section_names_idx].ofs_body
+        size: section_headers[section_names_idx].len_body
+        type: strings_struct
+        if: |
+          section_names_idx != section_header_idx_special::undefined.to_i
+          and section_names_idx < _root.header.num_section_headers
     types:
       program_header:
         -orig-id:
@@ -949,26 +969,6 @@ types:
                 'bits::b32': s4
                 'bits::b64': s8
             if: _parent.has_addend
-    instances:
-      program_headers:
-        pos: ofs_program_headers
-        size: program_header_size
-        type: program_header
-        repeat: expr
-        repeat-expr: num_program_headers
-      section_headers:
-        pos: ofs_section_headers
-        size: section_header_size
-        type: section_header
-        repeat: expr
-        repeat-expr: num_section_headers
-      section_names:
-        pos: section_headers[section_names_idx].ofs_body
-        size: section_headers[section_names_idx].len_body
-        type: strings_struct
-        if: |
-          section_names_idx != section_header_idx_special::undefined.to_i
-          and section_names_idx < _root.header.num_section_headers
 enums:
   # e_ident[EI_CLASS]
   bits:
