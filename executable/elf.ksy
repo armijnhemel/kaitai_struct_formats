@@ -594,7 +594,7 @@ types:
             type: u4
           - id: info
             -orig-id: sh_info
-            size: 4
+            type: u4
           - id: align
             -orig-id: sh_addralign
             type:
@@ -625,6 +625,7 @@ types:
                 'sh_type::rel': relocation_section(false)
                 'sh_type::rela': relocation_section(true)
                 'sh_type::gnu_versym': versym_section
+                'sh_type::gnu_verdef': verdef_section
             if: type != sh_type::nobits
           linked_section:
             value: _root.header.section_headers[linked_section_idx]
@@ -1006,8 +1007,9 @@ types:
               Symbol Table (`.dynsym` section).
 
               The value itself is not the version: it's a key that is matched
-              against the `vd_ndx` member of the `Elfxx_Verdef` structure if the
-              symbol is defined in this object, or the `vna_other` member of the
+              against the `version_index` (`vd_ndx`) field of the
+              `verdef_section_entry` (`Elfxx_Verdef`) type if the symbol is
+              defined in this object, or the `vna_other` member of the
               `Elfxx_Vernaux` structure if the symbol is required from another
               object. The "name" string of the matched entry specifies the
               version of the symbol.
@@ -1026,6 +1028,193 @@ types:
               This bit is set if the symbol is hidden, and is only visible with
               an explicit version number. This is a GNU extension.
             doc-ref: https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l1379
+      verdef_section:
+        doc: |
+          Version Definition Section, contained in the special section named
+          `.gnu.version_d` with the section type `sh_type::gnu_verdef`
+          (`SHT_GNU_verdef`).
+
+          The number of entries in this section must match the value of the
+          dynamic tag `dynamic_array_tags::verdefnum` (`DT_VERDEFNUM`) in the
+          Dynamic Section (`.dynamic`).
+
+          `_parent.linked_section` must be the string table that contains the
+          strings referenced by this section. Specifically, the string table in
+          the `.dynstr` section should be used (side note: the `readelf` command
+          doesn't even check which string table `sh_link` points to, and always
+          uses `.dynstr` for the lookups - see
+          <https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=binutils/readelf.c;h=f50d9281ea4bf7cc722c316b63620c52134ca9b6;hb=refs/tags/binutils-2_46_1#l13787>).
+
+          The `is_string_table_linked` value instance indicates whether the
+          string table is linked. If it is not, version strings will not be
+          available.
+        doc-ref:
+          - https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#SYMVERDEFS
+          - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-definition-section.html
+        seq:
+          - id: first_entry
+            type: verdef_section_entry
+        instances:
+          is_string_table_linked:
+            value: _parent.linked_section.type == sh_type::strtab
+            doc: |
+              Indicates whether a string table is linked. This should always be
+              `true` in spec-compliant ELF files. If it is `false`, the string
+              offsets in this section will not be resolved to strings.
+          num_entries:
+            value: _parent.info
+            doc: Number of entries (version definitions)
+            doc-ref: https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/section-headers.html#GUID-2CBE4879-2E76-426E-BB7F-CF0CB1D87C52__CHAPTER6-47976
+      verdef_section_entry:
+        -orig-id:
+          - Elf32_Verdef
+          - Elf64_Verdef
+          - Elfxx_Verdef
+        doc-ref:
+          - https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#VERDEFENTRIES
+          - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-definition-section.html
+        -webide-representation: 'i:{version_index:dec}[={version_index_special}] cnt:{num_aux_entries:dec} f:{flags_obj:flags} n:{first_aux}'
+        seq:
+          - size: 0
+            if: ofs_start < 0
+          - id: version
+            -orig-id: vd_version
+            type: u2
+            valid: 1
+            doc: Version revision, must be set to 1.
+          - id: flags
+            -orig-id: vd_flags
+            type: u2
+            doc: Version information flag bitmask. Access `flags_obj` instead.
+          - id: version_index
+            -orig-id: vd_ndx
+            type: u2
+            doc: |
+              Version index. Each version definition has a unique index that is
+              used to map each `versym_section_entry` to the corresponding
+              version definition.
+            doc-ref: https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-definition-section.html
+          - id: num_aux_entries
+            -orig-id: vd_cnt
+            type: u2
+            valid:
+              # From <https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-definition-section.html>:
+              #
+              # > `vd_aux`
+              # >
+              # > (...) The first element of the array must exist.
+              min: 1
+            doc: Number of associated verdaux array entries.
+          - id: hash
+            -orig-id: vd_hash
+            type: u4
+            doc: Version name hash value (ELF hash function).
+          - id: ofs_first_aux
+            -orig-id: vd_aux
+            type: u4
+            valid:
+              min: _sizeof
+            doc: |
+              Offset in bytes to the first `verdaux_entry` (`Elfxx_Verdaux`)
+              associated with this version definition. The offset is relative to
+              the start of this `verdef_section_entry`.
+          - id: ofs_next
+            -orig-id: vd_next
+            type: u4
+            valid:
+              expr: _ == 0 or _ >= _sizeof
+            doc: |
+              Offset to the next verdef entry, in bytes, relative to the start
+              of this `verdef_section_entry`. A value of zero means that there
+              is no next entry.
+        instances:
+          ofs_start:
+            value: _io.pos
+          flags_obj:
+            type: version_flags(flags)
+            -webide-parse-mode: eager
+          version_index_special:
+            value: version_index
+            enum: version_index_special
+          first_aux:
+            pos: ofs_start + ofs_first_aux
+            type: verdaux_entry
+            parent: _parent
+            doc: |
+              First auxiliary entry of type `verdaux_entry` (`Elfxx_Verdaux`).
+              The rest follow its `next` instance.
+            -webide-parse-mode: eager
+          next:
+            pos: ofs_start + ofs_next
+            type: verdef_section_entry
+            parent: _parent
+            if: ofs_next != 0
+      verdaux_entry:
+        -orig-id:
+          - Elf32_Verdaux
+          - Elf64_Verdaux
+          - Elfxx_Verdaux
+        doc-ref: https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#VERDEFEXTS
+        -webide-representation: '{name}'
+        seq:
+          - size: 0
+            if: ofs_start < 0
+          - id: ofs_name
+            -orig-id: vda_name
+            type: u4
+            doc: |
+              Offset to the version or dependency name string in the section
+              header, in bytes.
+          - id: ofs_next
+            -orig-id: vda_next
+            type: u4
+            doc: |
+              Offset to the next verdaux entry, in bytes, relative to the start
+              of this `verdaux_entry`. Zero terminates the array.
+        instances:
+          ofs_start:
+            value: _io.pos
+          name:
+            io: _parent._parent.linked_section.body.as<strings_struct>._io
+            pos: ofs_name
+            type: strz
+            encoding: UTF-8
+            if: _parent.is_string_table_linked
+            -webide-parse-mode: eager
+          next:
+            pos: ofs_start + ofs_next
+            type: verdaux_entry
+            parent: _parent
+            if: ofs_next != 0
+      version_flags:
+        doc: |
+          Version information flag bitmask, shared by the `flags` (`vd_flags`)
+          field of `verdef_section_entry` (`Elfxx_Verdef`) and the `flags`
+          (`vna_flags`) field of `vernaux_entry` (`Elfxx_Vernaux`).
+        doc-ref:
+          - https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#SYMSTARTSEQ
+          - https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l1077
+        params:
+          - id: value
+            type: u2
+        instances:
+          base:
+            -orig-id: VER_FLG_BASE
+            value: value & 0x1 != 0
+            doc: Version definition of the file itself (the base definition).
+          weak:
+            -orig-id: VER_FLG_WEAK
+            value: value & 0x2 != 0
+            doc: |
+              Weak version identifier.
+
+              A weak version definition has no symbols associated with the
+              version. See [Creating a Weak Version
+              Definition](https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/creating-weak-version-definition.html).
+          info:
+            -orig-id: VER_FLG_INFO
+            value: value & 0x4 != 0
+            doc-ref: https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l1366
 enums:
   # e_ident[EI_CLASS]
   bits:
@@ -2739,7 +2928,10 @@ enums:
     0x6ffffffa: relcount
     0x6ffffffb: flags_1
     0x6ffffffc: verdef
-    0x6ffffffd: verdefnum
+    0x6ffffffd:
+      id: verdefnum
+      -orig-id: DT_VERDEFNUM
+      doc: Number of version definitions
     0x6ffffffe: verneed
     0x6fffffff: verneednum
     # 0x70000000: lo_proc
