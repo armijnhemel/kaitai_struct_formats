@@ -2672,15 +2672,30 @@ enums:
       -orig-id: VER_NDX_ELIMINATE
       doc: Symbol is to be eliminated.
       doc-ref: https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l1092
+  # https://gabi.xinuos.com/elf/05-symtab.html#symbol-visibility
   # https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/symbol-table-section.html#GUID-DBDD92CB-D58A-4CB5-861F-8868D8CB4552__CHAPTER7-27
   symbol_visibility:
-    0: default
-    1: internal
-    2: hidden
-    3: protected
-    4: exported
-    5: singleton
-    6: eliminate
+    0:
+      id: default
+      -orig-id: STV_DEFAULT
+    1:
+      id: internal
+      -orig-id: STV_INTERNAL
+    2:
+      id: hidden
+      -orig-id: STV_HIDDEN
+    3:
+      id: protected
+      -orig-id: STV_PROTECTED
+    4:
+      id: exported
+      -orig-id: STV_EXPORTED
+    5:
+      id: singleton
+      -orig-id: STV_SINGLETON
+    6:
+      id: eliminate
+      -orig-id: STV_ELIMINATE
   # https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/symbol-table-section.html#GUID-DBDD92CB-D58A-4CB5-861F-8868D8CB4552__CHAPTER6-TBL-21
   symbol_binding:
     0:
