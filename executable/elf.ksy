@@ -991,52 +991,22 @@ types:
           - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-symbol-section.html
         seq:
           - id: entries
-            type: versym_section_entry
+            -orig-id:
+              - Elf32_Versym
+              - Elf64_Versym
+            type: version_index
             repeat: eos
-      versym_section_entry:
-        -orig-id:
-          - Elf32_Versym
-          - Elf64_Versym
-        doc-ref:
-          - https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#SYMVERTBL
-          - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-symbol-section.html
-        -webide-representation: 'i:{version_index:dec}[={version_index_special}] h:{is_hidden}'
-        seq:
-          - id: value_raw
-            type: u2
             doc: |
-              Raw value, don't read this field - access `version_index` and
-              `is_hidden` instead.
-        instances:
-          version_index:
-            -orig-id: VERSYM_VERSION
-            value: value_raw & 0x7fff
-            doc: |
-              Version reference for the corresponding symbol in the Dynamic
+              Version references for the corresponding symbols in the Dynamic
               Symbol Table (`.dynsym` section).
 
-              The value itself is not the version: it's a key that is matched
-              against the `version_index` (`vd_ndx`) field of the
+              These values are not the versions themselves: they are keys that
+              are matched against the `version_index` (`vd_ndx`) field of the
               `verdef_section_entry` (`Elfxx_Verdef`) type if the symbol is
               defined in this object, or the `vna_other` member of the
               `Elfxx_Vernaux` structure if the symbol is required from another
               object. The "name" string of the matched entry specifies the
               version of the symbol.
-
-              The values `version_index_special::local` (0) and
-              `version_index_special::global_symbol` (1) have special meanings.
-              The `version_index_special` value instance converts the integer
-              value to the `version_index_special` enum.
-          version_index_special:
-            value: version_index
-            enum: version_index_special
-          is_hidden:
-            -orig-id: VERSYM_HIDDEN
-            value: value_raw & 0x8000 != 0
-            doc: |
-              This bit is set if the symbol is hidden, and is only visible with
-              an explicit version number. This is a GNU extension.
-            doc-ref: https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l1379
       verdef_section:
         doc: |
           Version Definition Section, contained in the special section named
@@ -1098,6 +1068,9 @@ types:
           - id: version_index
             -orig-id: vd_ndx
             type: u2
+            valid:
+              # sanity check: the `is_hidden` bit (`VERSYM_HIDDEN`) should not be set
+              expr: _ & 0x8000 == 0
             doc: |
               Version index. Each version definition has a unique index that is
               used to map each `versym_section_entry` to the corresponding
@@ -1195,6 +1168,30 @@ types:
             type: verdaux_entry
             parent: _parent
             if: ofs_next != 0
+      version_index:
+        meta:
+          bit-endian: le
+        -webide-representation: 'i:{value:dec}[={version_index_special}] h:{is_hidden}'
+        seq:
+          - id: value
+            -orig-id: VERSYM_VERSION
+            type: b15
+            doc: |
+              The values `version_index_special::local` (0) and
+              `version_index_special::global_symbol` (1) have special meanings.
+              The `version_index_special` value instance converts the integer
+              value to the `version_index_special` enum.
+          - id: is_hidden
+            -orig-id: VERSYM_HIDDEN
+            type: b1
+            doc: |
+              This bit is set if the symbol is hidden, and is only visible with
+              an explicit version number. This is a GNU extension.
+            doc-ref: https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l1379
+        instances:
+          version_index_special:
+            value: value
+            enum: version_index_special
       version_flags:
         doc: |
           Version information flag bitmask, shared by the `flags` (`vd_flags`)
