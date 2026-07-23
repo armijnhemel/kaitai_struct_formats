@@ -823,8 +823,8 @@ types:
           - Elf32_Sym
           - Elf64_Sym
         doc-ref:
+          - https://gabi.xinuos.com/elf/05-symtab.html
           - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/symbol-table-section.html
-          - https://refspecs.linuxfoundation.org/elf/gabi4+/ch4.symtab.html
         -webide-representation: 'v:{value} s:{size:dec} t:{type} b:{bind} vis:{visibility} i:{sh_idx:dec}[={sh_idx_special}] n:{name}'
         seq:
           - id: ofs_name
@@ -847,6 +847,7 @@ types:
             type: b4
             enum: symbol_type
           - id: other
+            -orig-id: st_other
             type: u1
             doc: don't read this field, access `visibility` instead
           - id: sh_idx
@@ -887,8 +888,12 @@ types:
             if: ofs_name != 0 and _parent.is_string_table_linked
             -webide-parse-mode: eager
           visibility:
-            value: other & 0x03
+            -orig-id:
+              - ELF32_ST_VISIBILITY
+              - ELF64_ST_VISIBILITY
+            value: other & 0x7
             enum: symbol_visibility
+            doc-ref: https://github.com/xinuos/gabi/commit/acd5ebb2962cf243dca4983bc934442b42ef96f5
           sh_idx_special:
             value: sh_idx
             enum: section_header_idx_special
