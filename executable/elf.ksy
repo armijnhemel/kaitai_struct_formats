@@ -981,7 +981,9 @@ types:
           Symbol Table in the `.dynsym` section (section type `sh_type::dynsym`
           / `SHT_DYNSYM`). Each entry specifies the version defined for or
           required by the corresponding symbol in the Dynamic Symbol Table.
-        doc-ref: https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#SYMVERTBL
+        doc-ref:
+          - https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#SYMVERTBL
+          - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-symbol-section.html
         seq:
           - id: entries
             type: versym_section_entry
@@ -990,7 +992,9 @@ types:
         -orig-id:
           - Elf32_Versym
           - Elf64_Versym
-        doc-ref: https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#SYMVERTBL
+        doc-ref:
+          - https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#SYMVERTBL
+          - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-symbol-section.html
         -webide-representation: 'i:{version_index:dec}[={version_index_special}] h:{is_hidden}'
         seq:
           - id: value_raw
