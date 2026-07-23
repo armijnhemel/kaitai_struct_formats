@@ -2604,24 +2604,21 @@ enums:
     0x6ffffffa: sunw_move
     0x6ffffffb: sunw_comdat
     0x6ffffffc: sunw_syminfo
-    # 0x6ffffffd:
-    #   id: sunw_verdef
-    #   -orig-id: SHT_SUNW_verdef
     0x6ffffffd:
       id: gnu_verdef
-      -orig-id: SHT_GNU_verdef
-    # 0x6ffffffe:
-    #   id: sunw_verneed
-    #   -orig-id: SHT_SUNW_verneed
+      -orig-id:
+        - SHT_GNU_verdef
+        - SHT_SUNW_verdef
     0x6ffffffe:
       id: gnu_verneed
-      -orig-id: SHT_GNU_verneed
-    # 0x6fffffff:
-    #   id: sunw_versym
-    #   -orig-id: SHT_SUNW_versym
+      -orig-id:
+        - SHT_GNU_verneed
+        - SHT_SUNW_verneed
     0x6fffffff:
       id: gnu_versym
-      -orig-id: SHT_GNU_versym
+      -orig-id:
+        - SHT_GNU_versym
+        - SHT_SUNW_versym
     # 0x6fffffff: hi_sunw
     # 0x6fffffff: hi_os
     # 0x70000000: lo_proc
