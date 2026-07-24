@@ -626,6 +626,7 @@ types:
                 'sh_type::rela': relocation_section(true)
                 'sh_type::gnu_versym': versym_section
                 'sh_type::gnu_verdef': verdef_section
+                'sh_type::gnu_verneed': verneed_section
             if: type != sh_type::nobits
           linked_section:
             value: _root.header.section_headers[linked_section_idx]
@@ -997,19 +998,19 @@ types:
             type: version_index
             repeat: eos
             doc: |
-              Version references for the corresponding symbols in the Dynamic
+              Version indexes for the corresponding symbols in the Dynamic
               Symbol Table (`.dynsym` section).
 
               These values are not the versions themselves: they are keys that
               are matched against the `version_index` (`vd_ndx`) field of the
               `verdef_section_entry` (`Elfxx_Verdef`) type if the symbol is
-              defined in this object, or the `vna_other` member of the
-              `Elfxx_Vernaux` structure if the symbol is required from another
-              object. The "name" string of the matched entry specifies the
-              version of the symbol.
+              defined in this object, or the `version_index` (`vna_other`) field
+              of the `vernaux_entry` (`Elfxx_Vernaux`) type if the symbol is
+              required from another object. The `name` instance of the matched
+              entry specifies the version of the symbol.
       verdef_section:
         doc: |
-          Version Definition Section, contained in the special section named
+          Version Definitions, contained in the special section named
           `.gnu.version_d` with the section type `sh_type::gnu_verdef`
           (`SHT_GNU_verdef`).
 
@@ -1025,8 +1026,8 @@ types:
           <https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=binutils/readelf.c;h=f50d9281ea4bf7cc722c316b63620c52134ca9b6;hb=refs/tags/binutils-2_46_1#l13787>).
 
           The `is_string_table_linked` value instance indicates whether the
-          string table is linked. If it is not, version strings will not be
-          available.
+          string table is linked. If it is not, version names (the `name`
+          instance in the `verdaux_entry` type) will not be available.
         doc-ref:
           - https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#SYMVERDEFS
           - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-definition-section.html
@@ -1072,9 +1073,9 @@ types:
               # sanity check: the `is_hidden` bit (`VERSYM_HIDDEN`) should not be set
               expr: _ & 0x8000 == 0
             doc: |
-              Version index. Each version definition has a unique index that is
-              used to map each `versym_section_entry` to the corresponding
-              version definition.
+              Version index assigned to this version definition. A unique index
+              that entries in the Symbol Version Table (the `versym_section`
+              type) use to reference the corresponding version definition.
             doc-ref: https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-definition-section.html
           - id: num_aux_entries
             -orig-id: vd_cnt
@@ -1150,6 +1151,8 @@ types:
           - id: ofs_next
             -orig-id: vda_next
             type: u4
+            valid:
+              expr: _ == 0 or _ >= _sizeof
             doc: |
               Byte offset to the next verdaux entry, relative to the start of
               this `verdaux_entry`. A value of zero means that there is no next
@@ -1167,6 +1170,179 @@ types:
           next:
             pos: ofs_start + ofs_next
             type: verdaux_entry
+            parent: _parent
+            if: ofs_next != 0
+      verneed_section:
+        doc: |
+          Version Requirements, contained in the special section named
+          `.gnu.version_r` with the section type `sh_type::gnu_verneed`
+          (`SHT_GNU_verneed`). This section defines the required versions of
+          dynamic symbols from other shared objects.
+
+          The number of entries in this section must match the value of the
+          dynamic tag `dynamic_array_tags::verneednum` (`DT_VERNEEDNUM`) in the
+          Dynamic Section (`.dynamic`).
+
+          `_parent.linked_section` must be the string table that contains the
+          strings referenced by this section. Specifically, the string table in
+          the `.dynstr` section should be used (side note: the `readelf` command
+          doesn't even check which string table `sh_link` points to, and always
+          uses `.dynstr` for the lookups - see
+          <https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=binutils/readelf.c;h=f50d9281ea4bf7cc722c316b63620c52134ca9b6;hb=refs/tags/binutils-2_46_1#l13941>).
+
+          The `is_string_table_linked` value instance indicates whether the
+          string table is linked. If it is not, file names (the `file_name`
+          instance in the `verneed_section_entry` type) or version names (the
+          `name` instance in the `vernaux_entry` type) will not be available.
+        doc-ref:
+          - https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#SYMVERRQMTS
+          - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-dependency-section.html
+        seq:
+          - id: first_entry
+            type: verneed_section_entry
+        instances:
+          is_string_table_linked:
+            value: _parent.linked_section.type == sh_type::strtab
+            doc: |
+              Indicates whether a string table is linked. This should always be
+              `true` in spec-compliant ELF files. If it is `false`, the string
+              offsets in this section will not be resolved to strings.
+          num_entries:
+            value: _parent.info
+            doc: Number of entries (dependency versions)
+            doc-ref: https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/section-headers.html#GUID-2CBE4879-2E76-426E-BB7F-CF0CB1D87C52__CHAPTER6-47976
+      verneed_section_entry:
+        -orig-id:
+          - Elf32_Verneed
+          - Elf64_Verneed
+          - Elfxx_Verneed
+        doc-ref:
+          - https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#VERNEEDFIG
+          - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-dependency-section.html
+        -webide-representation: 'file:{file_name} cnt:{num_aux_entries:dec}'
+        seq:
+          - size: 0
+            if: ofs_start < 0
+          - id: version
+            -orig-id: vn_version
+            type: u2
+            valid: 1
+            doc: Version of the structure. Must be set to 1.
+          - id: num_aux_entries
+            -orig-id: vn_cnt
+            type: u2
+            valid:
+              # From <https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-dependency-section.html>:
+              #
+              # > `vn_aux`
+              # >
+              # > (...) At least one version dependency must exist.
+              min: 1
+            doc: Number of associated auxiliary entries.
+          - id: ofs_file_name
+            -orig-id: vn_file
+            type: u4
+            doc: Byte offset to the file name string in the linked string table.
+          - id: ofs_first_aux
+            -orig-id: vn_aux
+            type: u4
+            valid:
+              min: _sizeof
+            doc: |
+              Byte offset to the first associated `vernaux_entry`
+              (`Elfxx_Vernaux`). The offset is relative to the start of this
+              `verneed_section_entry`.
+          - id: ofs_next
+            -orig-id: vn_next
+            type: u4
+            valid:
+              expr: _ == 0 or _ >= _sizeof
+            doc: |
+              Byte offset to the next verneed entry, relative to the start of
+              this `verneed_section_entry`. A value of zero means that there is
+              no next entry.
+        instances:
+          ofs_start:
+            value: _io.pos
+          file_name:
+            io: _parent._parent.linked_section.body.as<strings_struct>._io
+            pos: ofs_file_name
+            type: strz
+            encoding: UTF-8
+            if: _parent.is_string_table_linked
+            -webide-parse-mode: eager
+          first_aux:
+            pos: ofs_start + ofs_first_aux
+            type: vernaux_entry
+            parent: _parent
+            doc: |
+              First auxiliary entry of type `vernaux_entry` (`Elfxx_Vernaux`).
+              The rest follow its `next` instance.
+            -webide-parse-mode: eager
+          next:
+            pos: ofs_start + ofs_next
+            type: verneed_section_entry
+            parent: _parent
+            if: ofs_next != 0
+      vernaux_entry:
+        -orig-id:
+          - Elf32_Vernaux
+          - Elf64_Vernaux
+          - Elfxx_Vernaux
+        doc-ref:
+          - https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#VERNEEDEXTFIG
+          - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-dependency-section.html
+        -webide-representation: '{version_index} f:{flags_obj:flags} n:{name}'
+        seq:
+          - size: 0
+            if: ofs_start < 0
+          - id: hash
+            -orig-id: vna_hash
+            type: u4
+            doc: Dependency name hash value (ELF hash function).
+          - id: flags
+            -orig-id: vna_flags
+            type: u2
+            doc: Dependency information flag bitmask. Access `flags_obj` instead.
+          - id: version_index
+            -orig-id: vna_other
+            type: version_index
+            doc: |
+              Version index assigned to this dependency version. A unique index
+              that entries in the Symbol Version Table (the `versym_section`
+              type) use to reference the corresponding dependency version.
+            doc-ref: https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-dependency-section.html
+          - id: ofs_name
+            -orig-id: vna_name
+            type: u4
+            doc: |
+              Byte offset to the dependency name string in the linked string
+              table.
+          - id: ofs_next
+            -orig-id: vna_next
+            type: u4
+            valid:
+              expr: _ == 0 or _ >= _sizeof
+            doc: |
+              Byte offset to the next vernaux entry, relative to the start of
+              this `vernaux_entry`. A value of zero means that there is no next
+              entry.
+        instances:
+          ofs_start:
+            value: _io.pos
+          flags_obj:
+            type: version_flags(flags)
+            -webide-parse-mode: eager
+          name:
+            io: _parent._parent.linked_section.body.as<strings_struct>._io
+            pos: ofs_name
+            type: strz
+            encoding: UTF-8
+            if: _parent.is_string_table_linked
+            -webide-parse-mode: eager
+          next:
+            pos: ofs_start + ofs_next
+            type: vernaux_entry
             parent: _parent
             if: ofs_next != 0
       version_index:
@@ -1237,7 +1413,10 @@ types:
           info:
             -orig-id: VER_FLG_INFO
             value: value & 0x4 != 0
-            doc-ref: https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l1366
+            doc: |
+              Version reference exists for informational purposes and does not
+              need to be validated at runtime.
+            doc-ref: https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-dependency-section.html
 enums:
   # e_ident[EI_CLASS]
   bits:
@@ -2972,7 +3151,10 @@ enums:
       -orig-id: DT_VERDEFNUM
       doc: Number of version definitions
     0x6ffffffe: verneed
-    0x6fffffff: verneednum
+    0x6fffffff:
+      id: verneednum
+      -orig-id: DT_VERNEEDNUM
+      doc: Number of dependency versions
     # 0x70000000: lo_proc
     0x70000001:
       id: sparc_register
