@@ -990,6 +990,7 @@ types:
         doc-ref:
           - https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#SYMVERTBL
           - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-symbol-section.html
+          - https://www.akkadia.org/drepper/symbol-versioning
         seq:
           - id: entries
             -orig-id:
@@ -1031,6 +1032,7 @@ types:
         doc-ref:
           - https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#SYMVERDEFS
           - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-definition-section.html
+          - https://www.akkadia.org/drepper/symbol-versioning
         seq:
           - id: first_entry
             type: verdef_section_entry
@@ -1053,6 +1055,7 @@ types:
         doc-ref:
           - https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#VERDEFENTRIES
           - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-definition-section.html
+          - https://www.akkadia.org/drepper/symbol-versioning
         -webide-representation: 'i:{version_index:dec}[={version_index_special}] cnt:{num_aux_entries:dec} f:{flags_obj:flags} n:{first_aux}'
         seq:
           - size: 0
@@ -1137,7 +1140,10 @@ types:
           - Elf32_Verdaux
           - Elf64_Verdaux
           - Elfxx_Verdaux
-        doc-ref: https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#VERDEFEXTS
+        doc-ref:
+          - https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#VERDEFEXTS
+          - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-definition-section.html
+          - https://www.akkadia.org/drepper/symbol-versioning
         -webide-representation: '{name}'
         seq:
           - size: 0
@@ -1197,6 +1203,7 @@ types:
         doc-ref:
           - https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#SYMVERRQMTS
           - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-dependency-section.html
+          - https://www.akkadia.org/drepper/symbol-versioning
         seq:
           - id: first_entry
             type: verneed_section_entry
@@ -1219,6 +1226,7 @@ types:
         doc-ref:
           - https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#VERNEEDFIG
           - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-dependency-section.html
+          - https://www.akkadia.org/drepper/symbol-versioning
         -webide-representation: 'file:{file_name} cnt:{num_aux_entries:dec}'
         seq:
           - size: 0
@@ -1292,6 +1300,7 @@ types:
         doc-ref:
           - https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#VERNEEDEXTFIG
           - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-dependency-section.html
+          - https://www.akkadia.org/drepper/symbol-versioning
         -webide-representation: '{version_index} f:{flags_obj:flags} n:{name}'
         seq:
           - size: 0
@@ -1393,6 +1402,7 @@ types:
         doc-ref:
           - https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#SYMSTARTSEQ
           - https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l1077
+          - https://www.akkadia.org/drepper/symbol-versioning
         params:
           - id: value
             type: u2
