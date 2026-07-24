@@ -1060,7 +1060,7 @@ types:
             -orig-id: vd_version
             type: u2
             valid: 1
-            doc: Version revision, must be set to 1.
+            doc: Version of the structure. Must be set to 1.
           - id: flags
             -orig-id: vd_flags
             type: u2
@@ -1086,7 +1086,7 @@ types:
               # >
               # > (...) The first element of the array must exist.
               min: 1
-            doc: Number of associated verdaux array entries.
+            doc: Number of associated auxiliary entries.
           - id: hash
             -orig-id: vd_hash
             type: u4
@@ -1097,7 +1097,7 @@ types:
             valid:
               min: _sizeof
             doc: |
-              Offset in bytes to the first `verdaux_entry` (`Elfxx_Verdaux`)
+              Byte offset to the first `verdaux_entry` (`Elfxx_Verdaux`)
               associated with this version definition. The offset is relative to
               the start of this `verdef_section_entry`.
           - id: ofs_next
@@ -1106,9 +1106,9 @@ types:
             valid:
               expr: _ == 0 or _ >= _sizeof
             doc: |
-              Offset to the next verdef entry, in bytes, relative to the start
-              of this `verdef_section_entry`. A value of zero means that there
-              is no next entry.
+              Byte offset to the next verdef entry, relative to the start of
+              this `verdef_section_entry`. A value of zero means that there is
+              no next entry.
         instances:
           ofs_start:
             value: _io.pos
@@ -1145,14 +1145,15 @@ types:
             -orig-id: vda_name
             type: u4
             doc: |
-              Offset to the version or dependency name string in the section
-              header, in bytes.
+              Byte offset to the version or dependency name string in the linked
+              string table.
           - id: ofs_next
             -orig-id: vda_next
             type: u4
             doc: |
-              Offset to the next verdaux entry, in bytes, relative to the start
-              of this `verdaux_entry`. Zero terminates the array.
+              Byte offset to the next verdaux entry, relative to the start of
+              this `verdaux_entry`. A value of zero means that there is no next
+              entry.
         instances:
           ofs_start:
             value: _io.pos
