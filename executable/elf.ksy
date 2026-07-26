@@ -1169,29 +1169,32 @@ types:
             parent: _parent
             if: ofs_next != 0
       version_index:
-        meta:
-          bit-endian: le
         -webide-representation: 'i:{value:dec}[={version_index_special}] h:{is_hidden}'
         seq:
-          - id: value
+          - id: raw
+            type: u2
+            doc: |
+              Raw value, don't read this field - access `value`,
+              `version_index_special` and `is_hidden` instead.
+        instances:
+          value:
             -orig-id: VERSYM_VERSION
-            type: b15
+            value: raw & 0x7fff
             doc: |
               The values `version_index_special::local` (0) and
               `version_index_special::global_symbol` (1) have special meanings.
               The `version_index_special` value instance converts the integer
               value to the `version_index_special` enum.
-          - id: is_hidden
+          version_index_special:
+            value: value
+            enum: version_index_special
+          is_hidden:
             -orig-id: VERSYM_HIDDEN
-            type: b1
+            value: raw & 0x8000 != 0
             doc: |
               This bit is set if the symbol is hidden, and is only visible with
               an explicit version number. This is a GNU extension.
             doc-ref: https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l1379
-        instances:
-          version_index_special:
-            value: value
-            enum: version_index_special
       version_flags:
         doc: |
           Version information flag bitmask, shared by the `flags` (`vd_flags`)
