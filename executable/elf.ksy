@@ -1186,8 +1186,21 @@ types:
               The `version_index_special` value instance converts the integer
               value to the `version_index_special` enum.
           version_index_special:
-            value: value
+            value: raw
             enum: version_index_special
+            doc: |
+              Note: we match special constants against the full 16-bit integer
+              value (called `raw` in this .ksy implementation), because that's
+              what the `readelf` command does when deciding whether to print
+              `0 (*local*)` or `1 (*global*)` in the `.gnu.version`
+              (`SHT_GNU_versym`) section - see
+              <https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=binutils/readelf.c;h=f50d9281ea4bf7cc722c316b63620c52134ca9b6;hb=refs/tags/binutils-2_46_1#l14079>.
+
+              Besides, `version_index_special::eliminate` (`VER_NDX_ELIMINATE`)
+              has a value of `0xff01`, which is a 16-bit value. If we matched
+              against `value` instead, `version_index_special::eliminate` would
+              be unreachable, because `value` contains only the lower 15 bits,
+              so its maximum possible value is `0x7fff`.
           is_hidden:
             -orig-id: VERSYM_HIDDEN
             value: raw & 0x8000 != 0
@@ -2670,7 +2683,11 @@ enums:
     0xff01:
       id: eliminate
       -orig-id: VER_NDX_ELIMINATE
-      doc: Symbol is to be eliminated.
+      doc: |
+        Symbol is to be eliminated.
+
+        This appears to be a Solaris-specific value - as far as I know, no GNU
+        software (such as glibc or binutils) uses it.
       doc-ref: https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l1092
   # https://gabi.xinuos.com/elf/05-symtab.html#symbol-visibility
   # https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/symbol-table-section.html#GUID-DBDD92CB-D58A-4CB5-861F-8868D8CB4552__CHAPTER7-27
