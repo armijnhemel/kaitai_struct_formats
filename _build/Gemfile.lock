@@ -26,6 +26,7 @@ DEPENDENCIES
   pygments.rb
 
 CHECKSUMS
+  bundler (4.0.17) sha256=214e21431b5665dd2f99df8a5511c6b151d7a72e8015c8b38f8b775b61cbb6c1
   commonmarker (2.8.2-aarch64-linux) sha256=715a5df28e5c1ec7b520e6441466062e9717b82193d2a5bd11a9c94f2f1e15f0
   commonmarker (2.8.2-aarch64-linux-musl) sha256=c7d587bd7978416978e84d0de7488906b8f29b3f67ce8424942f0ca9aa6899db
   commonmarker (2.8.2-arm-linux) sha256=da9da5c08d5133ad429ece13f2e93d3a30e1b23621ffac9040e185d7ea29bde6
@@ -37,4 +38,4 @@ CHECKSUMS
   pygments.rb (4.0.0) sha256=f48bb03a28cf5eaa56e8d3d5a49b76a978199a51bd8643cc4b32fbb7ffecee57
 
 BUNDLED WITH
-  4.0.14
+  4.0.17
