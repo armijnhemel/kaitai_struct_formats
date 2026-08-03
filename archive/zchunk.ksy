@@ -62,13 +62,13 @@ types:
         type: compressed_integer
       - id: compression_type
         type: compressed_integer
-      - id: num_optional_element
+      - id: num_optional_elements
         type: compressed_integer
         if: has_optional_elements
       - id: optional_elements
         type: optional_element
         repeat: expr
-        repeat-expr: num_optional_element.value
+        repeat-expr: num_optional_elements.value
         if: has_optional_elements
     instances:
       has_data_streams:
