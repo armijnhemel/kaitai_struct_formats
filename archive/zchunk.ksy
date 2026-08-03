@@ -4,7 +4,7 @@ meta:
   file-extension: zck
   license: CC0-1.0
   endian: le
-doc-ref: https://github.com/zchunk/zchunk/blob/main/zchunk_format.txt
+doc-ref: https://github.com/zchunk/zchunk/blob/99e51afa38c723e7c25834c2c3b305d20ef55d04/zchunk_format.txt
 seq:
   - id: lead
     type: lead
