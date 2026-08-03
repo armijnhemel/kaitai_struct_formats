@@ -7,9 +7,9 @@ meta:
 doc-ref: https://github.com/zchunk/zchunk/blob/99e51afa38c723e7c25834c2c3b305d20ef55d04/zchunk_format.txt
 seq:
   - id: lead
-    type: lead
+    type: header_lead
   - id: header
-    type: header
+    type: header_without_lead
     size: lead.len_header.value
   - id: chunks
     size: chunk_metadata[_index].len_chunk.value
@@ -22,7 +22,7 @@ instances:
   chunk_metadata:
     value: header.index.chunks_metadata
 types:
-  lead:
+  header_lead:
     seq:
       - id: magic
         contents: [0, 'ZCK1']
@@ -43,7 +43,7 @@ types:
             checksum_type == checksum_types::sha512 ? 64 :
             checksum_type == checksum_types::sha512_128 ? 16 :
             0
-  header:
+  header_without_lead:
     seq:
       - id: preface
         type: preface
