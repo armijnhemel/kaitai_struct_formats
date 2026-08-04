@@ -154,6 +154,13 @@ types:
       - id: signature_data
         size: len_signature.value
   compressed_integer:
+    doc: |
+      Like `/common/vlq_base128_le` (LEB128), but the logic of the
+      "continuation" flag in the most significant bit is inverted, so `has_next`
+      is implemented the opposite way (if the highest bit is set to zero, it
+      means "continue", whereas in standard LEB128, the highest bit set to
+      **one** means "continue"). Therefore, we cannot simply import
+      `/common/vlq_base128_le` and use it, because it is incompatible.
     seq:
       - id: groups
         type: group
@@ -186,7 +193,7 @@ types:
           + (len >= 6 ? (groups[5].value << 35) : 0)
           + (len >= 7 ? (groups[6].value << 42) : 0)
           + (len >= 8 ? (groups[7].value << 49) : 0)
-        doc: Resulting value as normal integer
+        doc: Resulting unsigned value as normal integer
 enums:
   checksum_types:
     0: sha1
