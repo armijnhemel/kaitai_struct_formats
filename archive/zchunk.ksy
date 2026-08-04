@@ -91,6 +91,7 @@ types:
         value: compression_type.value
         enum: compression
   optional_element:
+    -webide-representation: 'ID {element_id.value:dec}'
     seq:
       - id: element_id
         type: compressed_integer
@@ -161,6 +162,7 @@ types:
       means "continue", whereas in standard LEB128, the highest bit set to
       **one** means "continue"). Therefore, we cannot simply import
       `/common/vlq_base128_le` and use it, because it is incompatible.
+    -webide-representation: '{value:hex} = {value:dec}'
     seq:
       - id: groups
         type: group
@@ -170,6 +172,7 @@ types:
       group:
         doc: |
           One byte group, clearly divided into 7-bit "value" chunk and 1-bit "continuation" flag.
+        -webide-representation: '{value}'
         seq:
           - id: b
             type: u1
