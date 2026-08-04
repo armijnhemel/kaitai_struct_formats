@@ -31,8 +31,15 @@ types:
       - id: len_header_rest
         type: compressed_integer
         doc: Size of the header, not including the lead
-      - id: lead_checksum
+      - id: header_checksum
         size: len_checksum
+        doc: |
+          Checksum of the entire header, which consists of `_root.lead` and
+          `_root.header_rest` (i.e. everything from the beginning of the file to
+          the end of `_root.header_rest.signatures`), not including the
+          `header_checksum` field itself (i.e. the input for the checksum
+          algorithm is a concatenation of the bytes preceding the
+          `header_checksum` field with the bytes following it).
     instances:
       checksum_type:
         value: checksum.value
