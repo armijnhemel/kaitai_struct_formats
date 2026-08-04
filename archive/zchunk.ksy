@@ -9,8 +9,8 @@ seq:
   - id: lead
     type: header_lead
   - id: header_rest
-    type: header_without_lead
     size: lead.len_header_rest.value
+    type: header_without_lead
   - id: chunks
     size: chunk_metadata[_index].len_chunk.value
     repeat: expr
@@ -58,8 +58,8 @@ types:
       - id: len_index
         type: compressed_integer
       - id: index
-        type: index
         size: len_index.value
+        type: index
       - id: num_signatures
         type: compressed_integer
       - id: signatures
