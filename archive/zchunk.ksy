@@ -52,8 +52,12 @@ types:
       - id: index
         type: index
         size: len_index.value
+      - id: num_signatures
+        type: compressed_integer
       - id: signatures
-        type: signatures
+        type: signature
+        repeat: expr
+        repeat-expr: num_signatures.value
   preface:
     seq:
       - id: checksum
@@ -133,14 +137,6 @@ types:
         type: compressed_integer
       - id: len_uncompressed_chunk
         type: compressed_integer
-  signatures:
-    seq:
-      - id: num_signatures
-        type: compressed_integer
-      - id: signatures
-        type: signature
-        repeat: expr
-        repeat-expr: num_signatures.value
   signature:
     seq:
       - id: signature_type
