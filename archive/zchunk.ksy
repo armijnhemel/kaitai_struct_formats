@@ -8,19 +8,19 @@ doc-ref: https://github.com/zchunk/zchunk/blob/99e51afa38c723e7c25834c2c3b305d20
 seq:
   - id: lead
     type: header_lead
-  - id: header
+  - id: header_rest
     type: header_without_lead
-    size: lead.len_header.value
+    size: lead.len_header_rest.value
   - id: chunks
     size: chunk_metadata[_index].len_chunk.value
     repeat: expr
     repeat-expr: num_chunks
 instances:
   num_chunks:
-    value: header.index.num_chunks.value - 1
+    value: header_rest.index.num_chunks.value - 1
     doc: the number of chunks includes the header, so -1
   chunk_metadata:
-    value: header.index.chunks_metadata
+    value: header_rest.index.chunks_metadata
 types:
   header_lead:
     seq:
@@ -28,8 +28,9 @@ types:
         contents: [0, 'ZCK1']
       - id: checksum
         type: compressed_integer
-      - id: len_header
+      - id: len_header_rest
         type: compressed_integer
+        doc: Size of the header, not including the lead
       - id: lead_checksum
         size: len_checksum
     instances:
