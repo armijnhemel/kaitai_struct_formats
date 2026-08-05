@@ -36,10 +36,10 @@ types:
         doc: |
           Checksum of the entire header, which consists of `_root.lead` and
           `_root.header_rest` (i.e. everything from the beginning of the file to
-          the end of `_root.header_rest.signatures`), not including the
-          `header_checksum` field itself (i.e. the input for the checksum
-          algorithm is a concatenation of the bytes preceding the
-          `header_checksum` field with the bytes following it).
+          the end of `_root.header_rest`), not including the `header_checksum`
+          field itself (i.e. the input for the checksum algorithm is a
+          concatenation of the bytes preceding the `header_checksum` field with
+          the bytes following it).
     instances:
       checksum_type:
         value: checksum.value
@@ -62,10 +62,23 @@ types:
         type: index
       - id: num_signatures
         type: compressed_integer
-      - id: signatures
-        type: signature
-        repeat: expr
-        repeat-expr: num_signatures.value
+        valid:
+          expr: _.value == 0
+        doc: |
+          Must be 0. The reference implementation also rejects any file with a
+          non-zero "Signature count", throwing a fatal error stating "Signatures
+          aren't supported yet" - see
+          [`src/lib/header.c:259-264`](https://github.com/zchunk/zchunk/blob/99e51afa38c723e7c25834c2c3b305d20ef55d04/src/lib/header.c#L259-L264).
+
+          Although the structure of signatures is defined [in the official
+          textual
+          specification](https://github.com/zchunk/zchunk/blob/99e51afa38c723e7c25834c2c3b305d20ef55d04/zchunk_format.txt#L219-L252),
+          no signature types are defined, and as of this writing no publicly
+          known implementation generates or interprets these signatures.
+          Therefore, we've decided not to implement them here either.
+
+          For more details, see
+          <https://github.com/kaitai-io/kaitai_struct_formats/pull/539#discussion_r3713109887>.
   preface:
     seq:
       - id: checksum
@@ -146,14 +159,6 @@ types:
         type: compressed_integer
       - id: len_uncompressed_chunk
         type: compressed_integer
-  signature:
-    seq:
-      - id: signature_type
-        type: compressed_integer
-      - id: len_signature
-        type: compressed_integer
-      - id: signature_data
-        size: len_signature.value
   compressed_integer:
     doc: |
       Like `/common/vlq_base128_le` (LEB128), but the logic of the
