@@ -11,6 +11,16 @@ seq:
   - id: header_rest
     size: lead.len_header_rest.value
     type: header_without_lead
+  - id: dict
+    size: header_rest.index.len_dict.value
+    doc: |
+      Custom dictionary used when compressing each chunk. It's compressed itself
+      without a dictionary.
+
+      The official zchunk specification calls this section "Compressed Dict".
+      It's also called a "dictionary chunk". `zck_read_header -c` presents it as
+      "chunk 0" (which is always shown in the chunk table, but can have size 0
+      if the dictionary is not in use).
   - id: chunks
     size: chunk_metadata[_index].len_chunk.value
     repeat: expr
