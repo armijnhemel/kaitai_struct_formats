@@ -1,7 +1,9 @@
 meta:
   id: zchunk
   title: Zchunk
-  file-extension: zck
+  file-extension:
+    - zck # magic '\0ZCK1' (`lead.is_detached_header` is `false`)
+    - zhr # magic '\0ZHR1' (`lead.is_detached_header` is `true`)
   license: CC0-1.0
   endian: le
 doc-ref: https://github.com/zchunk/zchunk/blob/99e51afa38c723e7c25834c2c3b305d20ef55d04/zchunk_format.txt
@@ -25,6 +27,13 @@ seq:
     size: chunk_metadata[_index].len_chunk.value
     repeat: expr
     repeat-expr: num_chunks
+    if: not lead.is_detached_header
+    doc: |
+      Chunks of data, each compressed with the custom dictionary `dict` (if
+      applicable).
+
+      They are not included in a detached header (`.zhr`) file. Detached headers
+      contain the dictionary, but none of the data chunks.
 instances:
   num_chunks:
     value: header_rest.index.num_chunks.value - 1
@@ -35,7 +44,16 @@ types:
   header_lead:
     seq:
       - id: magic
-        contents: [0, 'ZCK1']
+        size: 5
+        valid:
+          any-of:
+            - '[0x00, 0x5a, 0x43, 0x4b, 0x31]' # '\0ZCK1'
+            - '[0x00, 0x5a, 0x48, 0x52, 0x31]' # '\0ZHR1'
+        doc: |
+          There are two valid magic numbers for zchunk files:
+
+          * `'\0ZCK1'` identifies a zchunk version 1 file (`.zck`)
+          * `'\0ZHR1'` identifies a zchunk version 1 detached header file (`.zhr`)
       - id: checksum
         type: compressed_integer
       - id: len_header_rest
@@ -50,7 +68,16 @@ types:
           field itself (i.e. the input for the checksum algorithm is a
           concatenation of the bytes preceding the `header_checksum` field with
           the bytes following it).
+
+          For detached headers, the checksum is calculated as if the `magic`
+          field were set to `'\0ZCK1'`, so that it matches the checksum in the
+          full zchunk file.
     instances:
+      is_detached_header:
+        value: magic[2] == 0x48
+        doc: |
+          Determines whether this file is a zchunk detached header (`.zhr`). If
+          not, it is a complete zchunk file (`.zck`).
       checksum_type:
         value: checksum.value
         enum: checksum_types
