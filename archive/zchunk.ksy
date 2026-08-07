@@ -7,6 +7,7 @@ meta:
   xref:
     justsolve: Zchunk
   license: CC0-1.0
+  ks-version: '0.10'
   endian: le
 doc-ref: https://github.com/zchunk/zchunk/blob/99e51afa38c723e7c25834c2c3b305d20ef55d04/zchunk_format.txt
 seq:
