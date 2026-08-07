@@ -110,6 +110,11 @@ types:
         value: flags.value & 0b1 == 0b1
       has_optional_elements:
         value: flags.value & 0b10 == 0b10
+      has_uncompressed_source:
+        value: flags.value & 0b100 == 0b100
+        doc: |
+          The file may be applied against an uncompressed source. This adds an
+          uncompressed checksum to every index entry, including the dictionary.
       compression:
         value: compression_type.value
         enum: compression
@@ -133,12 +138,23 @@ types:
         if: _parent.preface.has_data_streams
       - id: dict_checksum
         size: len_checksum
+      - id: uncompressed_dict_checksum
+        size: len_checksum
+        if: _parent.preface.has_uncompressed_source
+        doc: |
+          Checksum of the uncompressed dictionary. It has no real use, as the
+          uncompressed source won't have a dictionary.
       - id: len_dict
         type: compressed_integer
       - id: len_uncompressed_dict
         type: compressed_integer
       - id: chunks_metadata
-        type: chunk(len_checksum, _parent.preface.has_data_streams)
+        type: |
+          chunk(
+            len_checksum,
+            _parent.preface.has_data_streams,
+            _parent.preface.has_uncompressed_source
+          )
         repeat: expr
         repeat-expr: num_chunks.value - 1
         doc: the number of chunks includes the header, so -1
@@ -159,12 +175,20 @@ types:
         type: u4
       - id: has_data_streams
         type: bool
+      - id: has_uncompressed_source
+        type: bool
     seq:
       - id: chunk_stream
         type: compressed_integer
         if: has_data_streams
       - id: chunk_checksum
         size: len_checksum
+      - id: uncompressed_chunk_checksum
+        size: len_checksum
+        if: has_uncompressed_source
+        doc: |
+          Checksum of the uncompressed chunk. Used to detect whether a chunk
+          from an uncompressed source is identical to the compressed chunk.
       - id: len_chunk
         type: compressed_integer
       - id: len_uncompressed_chunk
