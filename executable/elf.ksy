@@ -1401,7 +1401,7 @@ types:
           (`vna_flags`) field of `vernaux_entry` (`Elfxx_Vernaux`).
         doc-ref:
           - https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#SYMSTARTSEQ
-          - https://forge.sourceware.org/glibc/glibc-mirror/src/tag/glibc-2.43/elf/elf.h#L1077
+          - https://forge.sourceware.org/glibc/glibc-mirror/src/tag/glibc-2.43/elf/elf.h#L1078
           - https://www.akkadia.org/drepper/symbol-versioning
         params:
           - id: value
@@ -1445,7 +1445,7 @@ enums:
       id: be
       -orig-id: ELFDATA2MSB
   # https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/common.h#L60
-  # https://forge.sourceware.org/glibc/glibc-mirror/src/tag/glibc-2.43/elf/elf.h#L134
+  # https://forge.sourceware.org/glibc/glibc-mirror/src/tag/glibc-2.43/elf/elf.h#L135
   # https://github.com/llvm/llvm-project/blob/ca7933e47d3a3451d81e72ac174dcb5aa28b59d1/llvm/include/llvm/BinaryFormat/ELF.h#L344 (Git tag "llvmorg-22.1.8")
   # https://gabi.xinuos.com/v42/elf/b-osabi.html
   os_abi:
