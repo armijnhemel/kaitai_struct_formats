@@ -128,8 +128,11 @@ types:
           [`mini-uncomp-cksums.zck`](https://github.com/kaitai-io/kaitai_struct_samples/blob/1d2fe11c971fb7e86f343b77a1ed341a0217e86a/archive/zchunk/README.md#mini-uncomp-cksumszck).
       - id: flags
         type: compressed_integer
-      - id: compression_type
+      - id: compression_type_int
         type: compressed_integer
+        doc: |
+          Raw integer, don't read this field - access `compression_type`
+          instead.
       - id: num_optional_elements
         type: compressed_integer
         if: has_optional_elements
@@ -148,9 +151,9 @@ types:
         doc: |
           The file may be applied against an uncompressed source. This adds an
           uncompressed checksum to every index entry, including the dictionary.
-      compression:
-        value: compression_type.value
-        enum: compression
+      compression_type:
+        value: compression_type_int.value
+        enum: compression_types
   optional_element:
     -webide-representation: 'ID {element_id.value:dec}'
     seq:
@@ -287,6 +290,6 @@ enums:
     1: sha256
     2: sha512
     3: sha512_128 # first 128 bits of sha512 checksum
-  compression:
+  compression_types:
     0: none
     2: zstd
