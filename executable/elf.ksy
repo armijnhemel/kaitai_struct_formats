@@ -1660,29 +1660,29 @@ enums:
       id: s370
       -orig-id: EM_S370
       doc: IBM System/370 (S/370)
-    # 10:
-    #   id: mips_rs3_le
-    #   -orig-id:
-    #     - EM_MIPS_RS3_LE # MIPS R3000 little-endian
-    #     - EM_MIPS_RS4_BE # MIPS R4000 big-endian
-    #   doc: |
-    #     MIPS R3000 little-endian (Oct 4 1999 Draft). Deprecated.
-    #
-    #     The Linux kernel source code (Git tag "v7.1") has the [following
-    #     comment](https://github.com/torvalds/linux/blob/8cd9520d35a6c38db6567e97dd93b1f11f185dc6/include/uapi/linux/elf-em.h#L15-L19):
-    #
-    #     > Next two are historical and binaries and modules of these types will
-    #     > be rejected by Linux.
-    #
-    #     <https://github.com/radareorg/radare2/issues/2078> shows that the
-    #     `EM_MIPS` value is also used for little-endian binaries (not just
-    #     big-endian).
-    #   doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/commit/39834263784567c306fbccb8230ddd1badca53fe
-    # 11:
-    #   id: old_sparc_v9
-    #   -orig-id: EM_OLD_SPARCV9
-    #   doc: Old version of Sparc v9, from before the ABI. Deprecated.
-    #   doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/common.h#L121
+    10:
+      id: mips_rs3_le
+      -orig-id:
+        - EM_MIPS_RS3_LE # MIPS R3000 little-endian
+        - EM_MIPS_RS4_BE # MIPS R4000 big-endian
+      doc: |
+        MIPS R3000 little-endian (Oct 4 1999 Draft). Deprecated.
+
+        The Linux kernel source code (Git tag "v7.1") has the [following
+        comment](https://github.com/torvalds/linux/blob/8cd9520d35a6c38db6567e97dd93b1f11f185dc6/include/uapi/linux/elf-em.h#L15-L19):
+
+        > Next two are historical and binaries and modules of these types will
+        > be rejected by Linux.
+
+        <https://github.com/radareorg/radare2/issues/2078> shows that the
+        `EM_MIPS` value is also used for little-endian binaries (not just
+        big-endian).
+      doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/commit/39834263784567c306fbccb8230ddd1badca53fe
+    11:
+      id: old_sparc_v9
+      -orig-id: EM_OLD_SPARCV9
+      doc: Old version of Sparc v9, from before the ABI. Deprecated.
+      doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/common.h#L121
     15:
       id: parisc
       -orig-id: EM_PARISC
