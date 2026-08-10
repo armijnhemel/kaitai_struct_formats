@@ -127,6 +127,16 @@ types:
         type: compressed_integer
       - id: compression_type_int
         type: compressed_integer
+        -affected-by: 88 # inlining
+        valid:
+          # This ensures that the compression type is known. If
+          # [inlining](https://github.com/kaitai-io/kaitai_struct/issues/88) was
+          # implemented, we could use `enum: compression_types` directly in this
+          # field and use `valid/in-enum: true` to achieve the same effect, but
+          # it's not implemented.
+          expr: |
+            _.value == compression_types::none.to_i or
+            _.value == compression_types::zstd.to_i
         doc: |
           Raw integer, don't read this field - access `compression_type`
           instead.
