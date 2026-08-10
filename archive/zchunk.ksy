@@ -149,7 +149,14 @@ types:
           instead.
       - id: num_optional_elements
         type: compressed_integer
+        valid:
+          expr: _.value >= 1
         if: has_optional_elements
+        doc: |
+          If present, it must be at least 1. This is because if there are no
+          optional elements, `has_optional_elements` must be false, and then
+          neither this field nor `optional_elements` is present.
+        doc-ref: https://github.com/zchunk/zchunk/blob/99e51afa38c723e7c25834c2c3b305d20ef55d04/zchunk_format.txt#L99-L102
       - id: optional_elements
         type: optional_element
         repeat: expr
