@@ -27,9 +27,9 @@ seq:
       "chunk 0" (which is always shown in the chunk table, but can have size 0
       if the dictionary is not in use).
   - id: chunks
-    size: chunk_metadata[_index].len_chunk.value
+    size: header_rest.index.chunks_metadata[_index].len_chunk.value
     repeat: expr
-    repeat-expr: chunk_metadata.size
+    repeat-expr: header_rest.index.chunks_metadata.size
     if: not lead.is_detached_header
     doc: |
       Chunks of data, each compressed with the custom dictionary `dict` (if
@@ -37,9 +37,6 @@ seq:
 
       They are not included in a detached header (`.zhr`) file. Detached headers
       contain the dictionary, but none of the data chunks.
-instances:
-  chunk_metadata:
-    value: header_rest.index.chunks_metadata
 types:
   header_lead:
     seq:
