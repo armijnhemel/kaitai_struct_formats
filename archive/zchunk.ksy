@@ -191,7 +191,11 @@ types:
           [`src/lib/index/index_read.c:181-184`](https://github.com/zchunk/zchunk/blob/99e51afa38c723e7c25834c2c3b305d20ef55d04/src/lib/index/index_read.c#L181-L184).
       - id: dict_stream
         type: compressed_integer
+        valid:
+          expr: _.value == 0
         if: _parent.preface.has_data_streams
+        doc: If present, it must always be 0.
+        doc-ref: https://github.com/zchunk/zchunk/blob/99e51afa38c723e7c25834c2c3b305d20ef55d04/zchunk_format.txt#L159-L162
       - id: dict_checksum
         size: chunk_checksum_type.len_checksum
       - id: uncompressed_dict_checksum
