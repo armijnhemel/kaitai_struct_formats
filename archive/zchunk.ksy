@@ -57,13 +57,16 @@ types:
 
           * `'\0ZCK1'` identifies a zchunk version 1 file (`.zck`)
           * `'\0ZHR1'` identifies a zchunk version 1 detached header file (`.zhr`)
-      - id: checksum
-        type: compressed_integer
+      - id: overall_checksum_type
+        type: checksum_type
+        doc: |
+          Type of the checksum used for `header_checksum` and
+          `_root.header_rest.preface.data_checksum`.
       - id: len_header_rest
         type: compressed_integer
         doc: Size of the header, not including the lead
       - id: header_checksum
-        size: len_checksum
+        size: overall_checksum_type.len_checksum
         doc: |
           Checksum of the entire header, which consists of `_root.lead` and
           `_root.header_rest` (i.e. everything from the beginning of the file to
@@ -81,16 +84,6 @@ types:
         doc: |
           Determines whether this file is a zchunk detached header (`.zhr`). If
           not, it is a complete zchunk file (`.zck`).
-      checksum_type:
-        value: checksum.value
-        enum: checksum_types
-      len_checksum:
-        value: |
-            checksum_type == checksum_types::sha1 ? 20 :
-            checksum_type == checksum_types::sha256 ? 32 :
-            checksum_type == checksum_types::sha512 ? 64 :
-            checksum_type == checksum_types::sha512_128 ? 16 :
-            0
   header_without_lead:
     seq:
       - id: preface
@@ -122,12 +115,12 @@ types:
   preface:
     seq:
       - id: data_checksum
-        size: _root.lead.len_checksum
+        size: _root.lead.overall_checksum_type.len_checksum
         doc: |
           Total data checksum. Checksum of everything after the header,
           including the compressed dictionary (`_root.dict`) and all compressed
           chunks (`_root.chunks`). The type of this checksum is
-          `_root.lead.checksum_type`.
+          `_root.lead.overall_checksum_type.value`.
 
           If `has_uncompressed_source` is true, this checksum must not be
           checked and should not be generated. In that case, the reference
@@ -169,17 +162,21 @@ types:
         size: len_data.value
   index:
     seq:
-      - id: checksum
-        type: compressed_integer
+      - id: chunk_checksum_type
+        type: checksum_type
+        doc: |
+          Type of the checksum used for `dict_checksum` and for all
+          `chunks_metadata[...].chunk_checksum` and
+          `chunks_metadata[...].uncompressed_chunk_checksum`.
       - id: num_chunks
         type: compressed_integer
       - id: dict_stream
         type: compressed_integer
         if: _parent.preface.has_data_streams
       - id: dict_checksum
-        size: len_checksum
+        size: chunk_checksum_type.len_checksum
       - id: uncompressed_dict_checksum
-        size: len_checksum
+        size: chunk_checksum_type.len_checksum
         if: _parent.preface.has_uncompressed_source
         doc: |
           Checksum of the uncompressed dictionary. It has no real use, as the
@@ -191,24 +188,13 @@ types:
       - id: chunks_metadata
         type: |
           chunk(
-            len_checksum,
+            chunk_checksum_type.len_checksum,
             _parent.preface.has_data_streams,
             _parent.preface.has_uncompressed_source
           )
         repeat: expr
         repeat-expr: num_chunks.value - 1
         doc: the number of chunks includes the header, so -1
-    instances:
-      checksum_type:
-        value: checksum.value
-        enum: checksum_types
-      len_checksum:
-        value: |
-            checksum_type == checksum_types::sha1 ? 20 :
-            checksum_type == checksum_types::sha256 ? 32 :
-            checksum_type == checksum_types::sha512 ? 64 :
-            checksum_type == checksum_types::sha512_128 ? 16 :
-            0
   chunk:
     params:
       - id: len_checksum
@@ -233,6 +219,25 @@ types:
         type: compressed_integer
       - id: len_uncompressed_chunk
         type: compressed_integer
+  # Common types
+  checksum_type:
+    -webide-representation: '{value}'
+    seq:
+      - id: raw
+        type: compressed_integer
+        doc: |
+          Raw integer, don't read this field - access `value` instead.
+    instances:
+      value:
+        value: raw.value
+        enum: checksum_types
+      len_checksum:
+        value: |
+          value == checksum_types::sha1 ? 20 :
+          value == checksum_types::sha256 ? 32 :
+          value == checksum_types::sha512 ? 64 :
+          value == checksum_types::sha512_128 ? 16 :
+          0
   compressed_integer:
     doc: |
       Like `/common/vlq_base128_le` (LEB128), but the logic of the
