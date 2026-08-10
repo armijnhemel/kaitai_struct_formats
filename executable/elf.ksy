@@ -22,7 +22,7 @@ meta:
   license: CC0-1.0
   ks-version: '0.11'
 doc-ref:
-  - https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43
+  - https://forge.sourceware.org/glibc/glibc-mirror/src/tag/glibc-2.43/elf/elf.h
   - https://refspecs.linuxfoundation.org/elf/gabi4+/contents.html
   - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/elf-application-binary-interface.html
 seq:
@@ -103,8 +103,8 @@ types:
   section_header_flags:
     doc-ref:
       - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/section-headers.html#GUID-2CBE4879-2E76-426E-BB7F-CF0CB1D87C52__CHAPTER6-10675
-      - https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l614
-      - https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l468
+      - https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/common.h#L614
+      - https://forge.sourceware.org/glibc/glibc-mirror/src/tag/glibc-2.43/elf/elf.h#L468
     params:
       - id: value
         type: u4
@@ -167,13 +167,13 @@ types:
         value: value & 0x0020_0000 != 0
         doc: Section should not be garbage collected by the linker
         doc-ref:
-          - https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l630
-          - https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l484
+          - https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/common.h#L630
+          - https://forge.sourceware.org/glibc/glibc-mirror/src/tag/glibc-2.43/elf/elf.h#L484
       gnu_mbind:
         -orig-id: SHF_GNU_MBIND
         value: value & 0x0100_0000 != 0
         doc: Mbind section
-        doc-ref: https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l631
+        doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/common.h#L631
 
       mask_proc:
         -orig-id: SHF_MASKPROC
@@ -191,7 +191,7 @@ types:
           > `SHF_LINK_ORDER`, and has been superseded by `SHF_LINK_ORDER`.
           > `SHF_ORDERED` is no longer supported.
         doc-ref:
-          - https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l485
+          - https://forge.sourceware.org/glibc/glibc-mirror/src/tag/glibc-2.43/elf/elf.h#L485
           - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/section-headers.html#GUID-2CBE4879-2E76-426E-BB7F-CF0CB1D87C52__CHAPTER6-10675
       exclude:
         -orig-id: SHF_EXCLUDE
@@ -225,7 +225,7 @@ types:
         doc: object uses static thread-local storage scheme
   dt_flag_1_values:
     doc-ref:
-      - https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l1008
+      - https://forge.sourceware.org/glibc/glibc-mirror/src/tag/glibc-2.43/elf/elf.h#L1008
       - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/dynamic-section.html#GUID-4336A69A-D905-4FCE-A398-80375A9E6464__CHAPTER6-TBL-53
     params:
       - id: value
@@ -272,7 +272,7 @@ types:
       trans:
         -orig-id: DF_1_TRANS
         value: value & 0x0000_0200 != 0
-        doc-ref: https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l1019
+        doc-ref: https://forge.sourceware.org/glibc/glibc-mirror/src/tag/glibc-2.43/elf/elf.h#L1019
       interpose:
         -orig-id: DF_1_INTERPOSE
         value: value & 0x0000_0400 != 0
@@ -289,7 +289,7 @@ types:
         -orig-id: DF_1_CONFALT
         value: value & 0x0000_2000 != 0
         doc: Configuration alternative created.
-        doc-ref: https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l1023
+        doc-ref: https://forge.sourceware.org/glibc/glibc-mirror/src/tag/glibc-2.43/elf/elf.h#L1023
       end_filtee:
         -orig-id: DF_1_ENDFILTEE
         value: value & 0x0000_4000 != 0
@@ -355,7 +355,7 @@ types:
       no_common:
         -orig-id: DF_1_NOCOMMON
         value: value & 0x4000_0000 != 0
-        doc-ref: https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l1040
+        doc-ref: https://forge.sourceware.org/glibc/glibc-mirror/src/tag/glibc-2.43/elf/elf.h#L1040
         doc: No COMMON symbols exist.
   endian_elf:
     meta:
@@ -750,9 +750,9 @@ types:
           program headers - see the source code for the `readelf` command:
 
           1. [`offset_from_vma` call site with an address from `DT_STRTAB` as an
-            argument](https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=binutils/readelf.c;h=f50d9281ea4bf7cc722c316b63620c52134ca9b6;hb=refs/tags/binutils-2_46_1#l13018)
+            argument](https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/binutils/readelf.c#L13018)
           2. [`offset_from_vma` function
-            definition](https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=binutils/readelf.c;h=f50d9281ea4bf7cc722c316b63620c52134ca9b6;hb=refs/tags/binutils-2_46_1#l7788)
+            definition](https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/binutils/readelf.c#L7788)
         doc-ref:
           - https://gabi.xinuos.com/v42/elf/08-dynamic.html#dynamic-section
           - https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/dynamic-section.html
@@ -1024,7 +1024,7 @@ types:
           the `.dynstr` section should be used (side note: the `readelf` command
           doesn't even check which string table `sh_link` points to, and always
           uses `.dynstr` for the lookups - see
-          <https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=binutils/readelf.c;h=f50d9281ea4bf7cc722c316b63620c52134ca9b6;hb=refs/tags/binutils-2_46_1#l13787>).
+          <https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/binutils/readelf.c#L13787>).
 
           The `is_string_table_linked` value instance indicates whether the
           string table is linked. If it is not, version names (the `name`
@@ -1194,7 +1194,7 @@ types:
           the `.dynstr` section should be used (side note: the `readelf` command
           doesn't even check which string table `sh_link` points to, and always
           uses `.dynstr` for the lookups - see
-          <https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=binutils/readelf.c;h=f50d9281ea4bf7cc722c316b63620c52134ca9b6;hb=refs/tags/binutils-2_46_1#l13941>).
+          <https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/binutils/readelf.c#L13941>).
 
           The `is_string_table_linked` value instance indicates whether the
           string table is linked. If it is not, file names (the `file_name`
@@ -1380,7 +1380,7 @@ types:
               what the `readelf` command does when deciding whether to print
               `0 (*local*)` or `1 (*global*)` in the `.gnu.version`
               (`SHT_GNU_versym`) section - see
-              <https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=binutils/readelf.c;h=f50d9281ea4bf7cc722c316b63620c52134ca9b6;hb=refs/tags/binutils-2_46_1#l14079>.
+              <https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/binutils/readelf.c#L14079>.
 
               Besides, `version_index_special::eliminate` (`VER_NDX_ELIMINATE`)
               has a value of `0xff01`, which is a 16-bit value. If we matched
@@ -1393,7 +1393,7 @@ types:
             doc: |
               This bit is set if the symbol is hidden, and is only visible with
               an explicit version number. This is a GNU extension.
-            doc-ref: https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l1379
+            doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/common.h#L1379
       version_flags:
         doc: |
           Version information flag bitmask, shared by the `flags` (`vd_flags`)
@@ -1401,7 +1401,7 @@ types:
           (`vna_flags`) field of `vernaux_entry` (`Elfxx_Vernaux`).
         doc-ref:
           - https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#SYMSTARTSEQ
-          - https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l1077
+          - https://forge.sourceware.org/glibc/glibc-mirror/src/tag/glibc-2.43/elf/elf.h#L1077
           - https://www.akkadia.org/drepper/symbol-versioning
         params:
           - id: value
@@ -1444,8 +1444,8 @@ enums:
     2:
       id: be
       -orig-id: ELFDATA2MSB
-  # https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l60
-  # https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l134
+  # https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/common.h#L60
+  # https://forge.sourceware.org/glibc/glibc-mirror/src/tag/glibc-2.43/elf/elf.h#L134
   # https://github.com/llvm/llvm-project/blob/ca7933e47d3a3451d81e72ac174dcb5aa28b59d1/llvm/include/llvm/BinaryFormat/ELF.h#L344 (Git tag "llvmorg-22.1.8")
   # https://gabi.xinuos.com/v42/elf/b-osabi.html
   os_abi:
@@ -1527,7 +1527,7 @@ enums:
       doc: NVIDIA CUDA architecture
       doc-ref:
         - https://github.com/llvm/llvm-project/blob/ca7933e47d3a3451d81e72ac174dcb5aa28b59d1/llvm/include/llvm/BinaryFormat/ELF.h#L364 Git tag "llvmorg-22.1.8"
-        - https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l79
+        - https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/common.h#L79
         - 'https://docs.nvidia.com/cuda/cuda-binary-utilities/index.html search for `"ei_osabi": 51,`'
     # 64-255: Architecture-specific value range
     64:
@@ -1587,8 +1587,8 @@ enums:
     4:
       id: core
       -orig-id: ET_CORE
-  # https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l106
-  # https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l169
+  # https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/common.h#L106
+  # https://forge.sourceware.org/glibc/glibc-mirror/src/tag/glibc-2.43/elf/elf.h#L169
   # https://gabi.xinuos.com/elf/a-emachine.html
   # https://github.com/torvalds/linux/blob/8cd9520d35a6c38db6567e97dd93b1f11f185dc6/include/uapi/linux/elf-em.h (Git tag "v7.1")
   # https://github.com/NationalSecurityAgency/ghidra/blob/c0f584bf229fffba61b36431f3ce30c0c3e4e682/Ghidra/Features/Base/src/main/java/ghidra/app/util/bin/format/elf/ElfConstants.java#L158-L562 (Git tag "Ghidra_12.1.2_build")
@@ -1682,7 +1682,7 @@ enums:
     #   id: old_sparc_v9
     #   -orig-id: EM_OLD_SPARCV9
     #   doc: Old version of Sparc v9, from before the ABI. Deprecated.
-    #   doc-ref: https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l121
+    #   doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/common.h#L121
     15:
       id: parisc
       -orig-id: EM_PARISC
@@ -1691,7 +1691,7 @@ enums:
       id: vpp500
       -orig-id:
         - EM_VPP500
-        - EM_VPP550 # https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l129
+        - EM_VPP550 # https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/common.h#L129
         - EM_PPC_OLD # Old version of PowerPC. Deprecated.
       doc: Fujitsu VPP500
     18:
@@ -1740,7 +1740,7 @@ enums:
         Motorola M*Core (also spelled as MCore or M-Core)
 
         `EM_RCE` is "Old name for MCore" according to
-        <https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l152>
+        <https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/common.h#L152>
     40:
       id: arm
       -orig-id: EM_ARM
@@ -1959,8 +1959,8 @@ enums:
         - EM_OPENRISC # Old constant that might be in use by some software.
       doc: OpenRISC 1000 32-bit embedded processor
       doc-ref:
-        - https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l205
-        - https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l455
+        - https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/common.h#L205
+        - https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/common.h#L455
     93:
       id: arc_compact
       -orig-id:
@@ -2337,7 +2337,7 @@ enums:
         - EM_INTELGT
         - EM_INTEL205
       doc: Intel Graphics Technology
-      doc-ref: https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l339
+      doc-ref: https://forge.sourceware.org/glibc/glibc-mirror/src/tag/glibc-2.43/elf/elf.h#L339
     206:
       id: intel206
       -orig-id: EM_INTEL206
@@ -2679,8 +2679,8 @@ enums:
       id: moxie_old
       -orig-id: EM_MOXIE_OLD
       doc: Old, unofficial value for Moxie
-  # https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l715
-  # https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=1ae68221a89723773b4ec5bf17c7455def7b90b8;hb=refs/tags/binutils-2_46_1#l472
+  # https://forge.sourceware.org/glibc/glibc-mirror/src/tag/glibc-2.43/elf/elf.h#L715
+  # https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/common.h#L472
   # https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/program-header.html#GUID-49F99618-9CDC-4A08-A94C-E2AA264AA01A__CHAPTER6-69880
   ph_type:
     0:
@@ -2755,7 +2755,7 @@ enums:
       -orig-id: PT_ARM_ARCHEXT
       doc: Platform architecture compatibility information
       doc-ref:
-        - https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/arm.h;h=091eea5d5d83fa656bcfe2603a8452c2615e7389;hb=refs/tags/binutils-2_46_1#l40
+        - https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/arm.h#L40
         - https://github.com/ARM-software/abi-aa/blob/daa7a94ca55973736c0e434a67a6e4bbcd35d7fa/aaelf32/aaelf32.rst#61program-header Git tag "2025Q4"
     0x70000001:
       id: arm_exidx
@@ -2764,7 +2764,7 @@ enums:
         - PT_ARM_UNWIND
       doc: Exception unwind tables
       doc-ref:
-        - https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/arm.h;h=091eea5d5d83fa656bcfe2603a8452c2615e7389;hb=refs/tags/binutils-2_46_1#l41
+        - https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/arm.h#L41
         - https://github.com/ARM-software/abi-aa/blob/daa7a94ca55973736c0e434a67a6e4bbcd35d7fa/aaelf32/aaelf32.rst#61program-header Git tag "2025Q4"
     # 0x7fffffff: hi_proc
   # https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/section-headers.html#GUID-2CBE4879-2E76-426E-BB7F-CF0CB1D87C52__CHAPTER6-73445
@@ -2851,7 +2851,7 @@ enums:
   # Reserved values of a symbol version index - see the `versym_section` type.
   #
   # https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#SYMVERTBL
-  # https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l1088
+  # https://forge.sourceware.org/glibc/glibc-mirror/src/tag/glibc-2.43/elf/elf.h#L1088
   # https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/version-symbol-section.html#GUID-DC6EBD6B-50B1-4197-A00B-A3CAE73FC9E4__CHAPTER6-TBL-32
   version_index_special:
     0:
@@ -2878,7 +2878,7 @@ enums:
 
         This appears to be a Solaris-specific value - as far as I know, no GNU
         software (such as glibc or binutils) uses it.
-      doc-ref: https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;h=46a01281cb0fb5322d5124f0443c11dea4d5b721;hb=refs/tags/glibc-2.43#l1092
+      doc-ref: https://forge.sourceware.org/glibc/glibc-mirror/src/tag/glibc-2.43/elf/elf.h#L1092
   # https://gabi.xinuos.com/elf/05-symtab.html#symbol-visibility
   # https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/symbol-table-section.html#GUID-DBDD92CB-D58A-4CB5-861F-8868D8CB4552__CHAPTER7-27
   symbol_visibility:
