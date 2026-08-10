@@ -125,6 +125,13 @@ types:
           [`mini-uncomp-cksums.zck`](https://github.com/kaitai-io/kaitai_struct_samples/blob/1d2fe11c971fb7e86f343b77a1ed341a0217e86a/archive/zchunk/README.md#mini-uncomp-cksumszck).
       - id: flags
         type: compressed_integer
+        valid:
+          expr: _.value <= 0b111
+        doc: |
+          Compressed integer containing a bitmask of the flags. All unused flags
+          MUST be set to 0. If a decoder sees a flag set that it doesn't
+          recognize, it MUST exit with an error.
+        doc-ref: https://github.com/zchunk/zchunk/blob/99e51afa38c723e7c25834c2c3b305d20ef55d04/zchunk_format.txt#L78-L81
       - id: compression_type_int
         type: compressed_integer
         -affected-by: 88 # inlining
