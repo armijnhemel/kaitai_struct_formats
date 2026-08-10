@@ -243,6 +243,14 @@ types:
     seq:
       - id: raw
         type: compressed_integer
+        -affected-by: 88 # inlining
+        valid:
+          # This ensures that the checksum type is known. If
+          # [inlining](https://github.com/kaitai-io/kaitai_struct/issues/88) was
+          # implemented, we could use `enum: checksum_types` directly in this
+          # field and use `valid/in-enum: true` to achieve the same effect, but
+          # it's not implemented.
+          expr: len_checksum != 0
         doc: |
           Raw integer, don't read this field - access `value` instead.
     instances:
