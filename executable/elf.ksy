@@ -1677,7 +1677,7 @@ enums:
     #     <https://github.com/radareorg/radare2/issues/2078> shows that the
     #     `EM_MIPS` value is also used for little-endian binaries (not just
     #     big-endian).
-    #   doc-ref: https://sourceware.org/git/gitweb.cgi?p=binutils-gdb.git;h=39834263784567c306fbccb8230ddd1badca53fe
+    #   doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/commit/39834263784567c306fbccb8230ddd1badca53fe
     # 11:
     #   id: old_sparc_v9
     #   -orig-id: EM_OLD_SPARCV9
@@ -2964,12 +2964,14 @@ enums:
       doc: specifies a thread-local storage entity
     8:
       id: relc
+      -orig-id: STT_RELC
       doc: complex relocation expression
-      doc-ref: https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=0d381f0d27;hb=HEAD#l1009
+      doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/common.h#L1155
     9:
       id: srelc
+      -orig-id: STT_SRELC
       doc: signed complex relocation expression
-      doc-ref: https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=0d381f0d27;hb=HEAD#l1010
+      doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/common.h#L1156
     # 10: lo_os
     10:
       id: gnu_ifunc
@@ -3017,7 +3019,7 @@ enums:
     0xffff: xindex
     # 0xffff: hi_reserve
   # https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/dynamic-section.html#GUID-4336A69A-D905-4FCE-A398-80375A9E6464__CHAPTER6-TBL-52
-  # https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/elf.h;hb=0f62fe0532#l853
+  # https://forge.sourceware.org/glibc/glibc-mirror/src/tag/glibc-2.43/elf/elf.h#L888
   dynamic_array_tags:
     0:
       id: "null"
@@ -3124,7 +3126,8 @@ enums:
                               # use the 'd_val' field of the dynamic structure
     0x6ffffdf4:
       id: gnu_flags_1
-      doc-ref: https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=include/elf/common.h;h=0d381f0d27;hb=HEAD#l1091
+      -orig-id: DT_GNU_FLAGS_1
+      doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/common.h#L1243
     0x6ffffdf5: gnu_prelinked   # Prelinking timestamp
     0x6ffffdf6: gnu_conflictsz  # Size of conflict section
     0x6ffffdf7: gnu_liblistsz   # Size of library list
