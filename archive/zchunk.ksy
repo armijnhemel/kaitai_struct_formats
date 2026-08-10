@@ -29,7 +29,7 @@ seq:
   - id: chunks
     size: chunk_metadata[_index].len_chunk.value
     repeat: expr
-    repeat-expr: num_chunks
+    repeat-expr: chunk_metadata.size
     if: not lead.is_detached_header
     doc: |
       Chunks of data, each compressed with the custom dictionary `dict` (if
@@ -38,9 +38,6 @@ seq:
       They are not included in a detached header (`.zhr`) file. Detached headers
       contain the dictionary, but none of the data chunks.
 instances:
-  num_chunks:
-    value: header_rest.index.num_chunks.value - 1
-    doc: the number of chunks includes the header, so -1
   chunk_metadata:
     value: header_rest.index.chunks_metadata
 types:
@@ -173,6 +170,15 @@ types:
           `chunks_metadata[...].uncompressed_chunk_checksum`.
       - id: num_chunks
         type: compressed_integer
+        valid:
+          expr: _.value >= 1
+        doc: |
+          Number of chunks, **including** the dictionary chunk.
+
+          Must be at least 1, because the dictionary chunk is always present,
+          even if it is empty. The reference implementation also fails when the
+          number of chunks is 0, see
+          [`src/lib/index/index_read.c:181-184`](https://github.com/zchunk/zchunk/blob/99e51afa38c723e7c25834c2c3b305d20ef55d04/src/lib/index/index_read.c#L181-L184).
       - id: dict_stream
         type: compressed_integer
         if: _parent.preface.has_data_streams
@@ -196,8 +202,17 @@ types:
             _parent.preface.has_uncompressed_source
           )
         repeat: expr
-        repeat-expr: num_chunks.value - 1
-        doc: the number of chunks includes the header, so -1
+        repeat-expr: num_data_chunks
+        doc: |
+          Metadata of the data chunks. The dictionary is chunk 0 and its
+          metadata is stored in the `*dict*` fields above, so there is one fewer
+          entry here than indicated by `num_chunks`.
+    instances:
+      num_data_chunks:
+        value: num_chunks.value - 1
+        doc: |
+          Number of data chunks. `num_chunks` counts the dictionary as chunk 0,
+          so it is one greater than this number.
   chunk:
     params:
       - id: len_checksum
