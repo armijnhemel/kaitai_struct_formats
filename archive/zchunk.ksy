@@ -150,11 +150,11 @@ types:
         if: has_optional_elements
     instances:
       has_data_streams:
-        value: flags.value & 0b1 == 0b1
+        value: flags.value & 0b1 != 0
       has_optional_elements:
-        value: flags.value & 0b10 == 0b10
+        value: flags.value & 0b10 != 0
       has_uncompressed_source:
-        value: flags.value & 0b100 == 0b100
+        value: flags.value & 0b100 != 0
         doc: |
           The file may be applied against an uncompressed source. This adds an
           uncompressed checksum to every index entry, including the dictionary.
