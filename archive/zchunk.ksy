@@ -121,8 +121,18 @@ types:
           <https://github.com/kaitai-io/kaitai_struct_formats/pull/539#discussion_r3713109887>.
   preface:
     seq:
-      - id: checksum
+      - id: data_checksum
         size: _root.lead.len_checksum
+        doc: |
+          Total data checksum. Checksum of everything after the header,
+          including the compressed dictionary (`_root.dict`) and all compressed
+          chunks (`_root.chunks`). The type of this checksum is
+          `_root.lead.checksum_type`.
+
+          If `has_uncompressed_source` is true, this checksum must not be
+          checked and should not be generated. In that case, the reference
+          implementation writes it as all zeros - see the sample file
+          [`mini-uncomp-cksums.zck`](https://github.com/kaitai-io/kaitai_struct_samples/blob/1d2fe11c971fb7e86f343b77a1ed341a0217e86a/archive/zchunk/README.md#mini-uncomp-cksumszck).
       - id: flags
         type: compressed_integer
       - id: compression_type
