@@ -2767,87 +2767,352 @@ enums:
         - https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/arm.h#L41
         - https://github.com/ARM-software/abi-aa/blob/daa7a94ca55973736c0e434a67a6e4bbcd35d7fa/aaelf32/aaelf32.rst#61program-header Git tag "2025Q4"
     # 0x7fffffff: hi_proc
+  # https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/common.h#L526
+  # https://github.com/llvm/llvm-project/blob/ca7933e47d3a3451d81e72ac174dcb5aa28b59d1/llvm/include/llvm/BinaryFormat/ELF.h#L1144 (Git tag "llvmorg-22.1.8")
   # https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/section-headers.html#GUID-2CBE4879-2E76-426E-BB7F-CF0CB1D87C52__CHAPTER6-73445
-  # https://github.com/illumos/illumos-gate/blob/1d806c5f41/usr/src/boot/sys/sys/elf_common.h#L377-L462
   sh_type:
-    0: null_type
-    1: progbits
-    2: symtab
-    3: strtab
-    4: rela
-    5: hash
-    6: dynamic
-    7: note
-    8: nobits
-    9: rel
-    10: shlib
-    11: dynsym
-    14: init_array
-    15: fini_array
-    16: preinit_array
-    17: group
-    18: symtab_shndx
-    19: relr
-    # 0x60000000: lo_os
-    # 0x6fffffef: lo_sunw
+    0:
+      id: null_type
+      -orig-id: SHT_NULL
+      doc: Section header table entry unused
+    1:
+      id: progbits
+      -orig-id: SHT_PROGBITS
+      doc: Program specific (private) data
+    2:
+      id: symtab
+      -orig-id: SHT_SYMTAB
+      doc: Link editing symbol table
+    3:
+      id: strtab
+      -orig-id: SHT_STRTAB
+      doc: String table
+    4:
+      id: rela
+      -orig-id: SHT_RELA
+      doc: Relocation entries with addends
+    5:
+      id: hash
+      -orig-id: SHT_HASH
+      doc: Symbol hash table
+    6:
+      id: dynamic
+      -orig-id: SHT_DYNAMIC
+      doc: Dynamic linking information
+    7:
+      id: note
+      -orig-id: SHT_NOTE
+      doc: Information that marks the file in some way
+    8:
+      id: nobits
+      -orig-id: SHT_NOBITS
+      doc: Section occupies no space in file
+    9:
+      id: rel
+      -orig-id: SHT_REL
+      doc: Relocation entries, no addends
+    10:
+      id: shlib
+      -orig-id: SHT_SHLIB
+      doc: Reserved, unspecified semantics
+    11:
+      id: dynsym
+      -orig-id: SHT_DYNSYM
+      doc: Dynamic linking symbol table
+    14:
+      id: init_array
+      -orig-id: SHT_INIT_ARRAY
+      doc: Pointers to initialization functions
+    15:
+      id: fini_array
+      -orig-id: SHT_FINI_ARRAY
+      doc: Pointers to termination functions
+    16:
+      id: preinit_array
+      -orig-id: SHT_PREINIT_ARRAY
+      doc: Pointers to pre-init functions
+    17:
+      id: group
+      -orig-id: SHT_GROUP
+      doc: Section contains a section group
+    18:
+      id: symtab_shndx
+      -orig-id: SHT_SYMTAB_SHNDX
+      doc: Indices for `SHN_XINDEX` entries
+    19:
+      id: relr
+      -orig-id: SHT_RELR
+      doc: Relative relocations (only offsets)
+    # 0x60000000:
+    #   id: lo_os
+    #   -orig-id: SHT_LOOS
+    #   doc: First of OS specific semantics
+    0x60000001:
+      id: android_rel
+      -orig-id: SHT_ANDROID_REL
+      doc: Android packed relocation entries, no addends
+    0x60000002:
+      id: android_rela
+      -orig-id: SHT_ANDROID_RELA
+      doc: Android packed relocation entries with addends
+    0x6fff4700:
+      id: gnu_incremental_inputs
+      -orig-id: SHT_GNU_INCREMENTAL_INPUTS
+      doc: Incremental build data
+    0x6fff4c00:
+      id: llvm_odrtab
+      -orig-id: SHT_LLVM_ODRTAB
+      doc: LLVM ODR table
+    0x6fff4c01:
+      id: llvm_linker_options
+      -orig-id: SHT_LLVM_LINKER_OPTIONS
+      doc: LLVM Linker Options
+    0x6fff4c03:
+      id: llvm_addrsig
+      -orig-id: SHT_LLVM_ADDRSIG
+      doc: List of address-significant symbols for safe ICF
+    0x6fff4c04:
+      id: llvm_dependent_libraries
+      -orig-id: SHT_LLVM_DEPENDENT_LIBRARIES
+      doc: LLVM Dependent Library Specifiers
+    0x6fff4c05:
+      id: llvm_sympart
+      -orig-id: SHT_LLVM_SYMPART
+      doc: Symbol partition specification
+    0x6fff4c06:
+      id: llvm_part_ehdr
+      -orig-id: SHT_LLVM_PART_EHDR
+      doc: ELF header for loadable partition
+    0x6fff4c07:
+      id: llvm_part_phdr
+      -orig-id: SHT_LLVM_PART_PHDR
+      doc: Phdrs for loadable partition
+    0x6fff4c08:
+      id: llvm_bb_addr_map_v0
+      -orig-id: SHT_LLVM_BB_ADDR_MAP_V0
+      doc: |
+        LLVM Basic Block Address Map, version 0.
+
+        Superseded by `sh_type::llvm_bb_addr_map` (`SHT_LLVM_BB_ADDR_MAP`).
+        LLVM 21.1.0 removed support for this value - see
+        <https://github.com/llvm/llvm-project/commit/6b623a6622707ea47d84ab0069f766215a6fec44>
+        and [LLVM 21.1.0 Release Notes](https://releases.llvm.org/21.1.0/docs/ReleaseNotes.html#changes-to-the-llvm-tools).
+    0x6fff4c09:
+      id: llvm_call_graph_profile
+      -orig-id: SHT_LLVM_CALL_GRAPH_PROFILE
+      doc: LLVM Call Graph Profile
+    0x6fff4c0a:
+      id: llvm_bb_addr_map
+      -orig-id: SHT_LLVM_BB_ADDR_MAP
+      doc: LLVM Basic Block Address Map
+    0x6fff4c0b:
+      id: llvm_offloading
+      -orig-id: SHT_LLVM_OFFLOADING
+      doc: LLVM device offloading data
+    0x6fff4c0c:
+      id: llvm_lto
+      -orig-id: SHT_LLVM_LTO
+      doc: |
+        `.llvm.lto` section for fat LTO
+    0x6fff4c0d:
+      id: llvm_jt_sizes
+      -orig-id: SHT_LLVM_JT_SIZES
+      doc: LLVM jump tables sizes
+    0x6fff4c0e:
+      id: llvm_cfi_jump_table
+      -orig-id: SHT_LLVM_CFI_JUMP_TABLE
+      doc: LLVM CFI jump table
+    0x6fff4c0f:
+      id: llvm_call_graph
+      -orig-id: SHT_LLVM_CALL_GRAPH
+      doc: LLVM Call Graph Section
+    0x6fff4c10:
+      id: llvm_dyndbg_elf
+      -orig-id: SHT_LLVM_DYNDBG_ELF
+      doc: LLVM Dynamic Debugging ELF
+    0x6fffff00:
+      id: android_relr
+      -orig-id: SHT_ANDROID_RELR
+    # 0x6fffffeb:
+    #   id: lo_sunw
+    #   -orig-id: SHT_LOSUNW
+    #   doc: First of Solaris semantics
+    #   doc-ref: https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/section-headers.html#GUID-2CBE4879-2E76-426E-BB7F-CF0CB1D87C52__CHAPTER6-73445
+    0x6fffffeb:
+      id: sunw_ctf
+      -orig-id: SHT_SUNW_ctf
     0x6fffffec:
       id: sunw_symnsort
-      doc-ref: https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/section-headers.html#GUID-2CBE4879-2E76-426E-BB7F-CF0CB1D87C52__CHAPTER6-73445
+      -orig-id: SHT_SUNW_symnsort
     0x6fffffed:
       id: sunw_phname
-      doc-ref: https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/section-headers.html#GUID-2CBE4879-2E76-426E-BB7F-CF0CB1D87C52__CHAPTER6-73445
+      -orig-id: SHT_SUNW_phname
     0x6fffffee:
       id: sunw_ancillary
-      doc-ref: https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/section-headers.html#GUID-2CBE4879-2E76-426E-BB7F-CF0CB1D87C52__CHAPTER6-73445
-    0x6fffffef: sunw_capchain
-    0x6ffffff0: sunw_capinfo
-    0x6ffffff1: sunw_symsort
-    0x6ffffff2: sunw_tlssort
-    0x6ffffff3: sunw_ldynsym
-    0x6ffffff4: sunw_dof
-    0x6ffffff5: sunw_cap
-    # 0x6ffffff5: gnu_attributes
-    0x6ffffff6: sunw_signature
-    # 0x6ffffff6: gnu_hash
-    # 0x6ffffff7: gnu_liblist
-    0x6ffffff7: sunw_annotate
-    0x6ffffff8: sunw_debugstr
-    0x6ffffff9: sunw_debug
-    0x6ffffffa: sunw_move
-    0x6ffffffb: sunw_comdat
-    0x6ffffffc: sunw_syminfo
+      -orig-id: SHT_SUNW_ancillary
+    0x6fffffef:
+      id: sunw_capchain
+      -orig-id: SHT_SUNW_capchain
+    0x6ffffff0:
+      id: sunw_capinfo
+      -orig-id: SHT_SUNW_capinfo
+    0x6ffffff1:
+      id: sunw_symsort
+      -orig-id: SHT_SUNW_symsort
+    0x6ffffff2:
+      id: sunw_tlssort
+      -orig-id: SHT_SUNW_tlssort
+    0x6ffffff3:
+      id: sunw_ldynsym
+      -orig-id: SHT_SUNW_LDYNSYM
+    0x6ffffff4:
+      id: gnu_sframe
+      -orig-id: SHT_GNU_SFRAME
+      doc: SFrame stack trace information (added in GNU Binutils 2.45)
+      doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/common.h#L571
+    # 0x6ffffff4:
+    #   id: sunw_dof
+    #   -orig-id: SHT_SUNW_dof
+    0x6ffffff5:
+      id: gnu_attributes
+      -orig-id: SHT_GNU_ATTRIBUTES
+      doc: Object attributes
+    # 0x6ffffff5:
+    #   id: sunw_cap
+    #   -orig-id: SHT_SUNW_cap
+    0x6ffffff6:
+      id: gnu_hash
+      -orig-id: SHT_GNU_HASH
+      doc: GNU style symbol hash table
+    # 0x6ffffff6:
+    #   id: sunw_signature
+    #   -orig-id: SHT_SUNW_SIGNATURE
+    0x6ffffff7:
+      id: gnu_liblist
+      -orig-id: SHT_GNU_LIBLIST
+      doc: List of prelink dependencies
+    # 0x6ffffff7:
+    #   id: sunw_annotate
+    #   -orig-id: SHT_SUNW_ANNOTATE
+    0x6ffffff8:
+      id: checksum
+      -orig-id: SHT_CHECKSUM
+      doc: Checksum for DSO content
+    # 0x6ffffff8:
+    #   id: sunw_debugstr
+    #   -orig-id: SHT_SUNW_DEBUGSTR
+    0x6ffffff9:
+      id: gnu_object_only
+      -orig-id: SHT_GNU_OBJECT_ONLY
+      doc: Object only
+    # 0x6ffffff9:
+    #   id: sunw_debug
+    #   -orig-id: SHT_SUNW_DEBUG
+    0x6ffffffa:
+      id: sunw_move
+      -orig-id: SHT_SUNW_move
+    0x6ffffffb:
+      id: sunw_comdat
+      -orig-id: SHT_SUNW_COMDAT
+    0x6ffffffc:
+      id: sunw_syminfo
+      -orig-id: SHT_SUNW_syminfo
     0x6ffffffd:
       id: gnu_verdef
       -orig-id:
         - SHT_GNU_verdef
         - SHT_SUNW_verdef
+      doc: Versions defined by file
     0x6ffffffe:
       id: gnu_verneed
       -orig-id:
         - SHT_GNU_verneed
         - SHT_SUNW_verneed
+      doc: Versions needed by file
     0x6fffffff:
       id: gnu_versym
       -orig-id:
         - SHT_GNU_versym
         - SHT_SUNW_versym
-    # 0x6fffffff: hi_sunw
-    # 0x6fffffff: hi_os
-    # 0x70000000: lo_proc
-    0x70000000: sparc_gotdata
-    0x70000001: amd64_unwind
-    # 0x70000001: arm_exidx
-    0x70000002: arm_preemptmap
-    0x70000003: arm_attributes
+      doc: Symbol versions
+    # 0x6fffffff:
+    #   id: hi_sunw
+    #   -orig-id: SHT_HISUNW
+    #   doc: Last of Solaris semantics
+    #   doc-ref: https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/section-headers.html#GUID-2CBE4879-2E76-426E-BB7F-CF0CB1D87C52__CHAPTER6-73445
+    # 0x6fffffff:
+    #   id: hi_os
+    #   -orig-id: SHT_HIOS
+    #   doc: Last of OS specific semantics
+    # 0x70000000:
+    #   id: lo_proc
+    #   -orig-id: SHT_LOPROC
+    #   doc: First of processor-specific semantics
+    0x70000000:
+      id: sparc_gotdata
+      -orig-id: SHT_SPARC_GOTDATA
+      doc-ref: https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/section-headers.html#GUID-2CBE4879-2E76-426E-BB7F-CF0CB1D87C52__CHAPTER6-73445
+    0x70000001:
+      id: x86_64_unwind
+      -orig-id:
+        - SHT_X86_64_UNWIND
+        - SHT_AMD64_UNWIND # old name
+      doc: Unwind information
+      doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/x86-64.h#L121
+    # 0x70000001:
+    #   id: arm_exidx
+    #   -orig-id: SHT_ARM_EXIDX
+    #   doc: ARM unwind section
+    #   doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/arm.h#L80
+    0x70000002:
+      id: arm_preemptmap
+      -orig-id: SHT_ARM_PREEMPTMAP
+      doc: Preemption details
+      doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/arm.h#L81
+    0x70000003:
+      id: arm_attributes
+      -orig-id: SHT_ARM_ATTRIBUTES
+      doc: ARM build attributes
+      doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/arm.h#L82
+    # 0x70000003:
+    #   id: aarch64_attributes
+    #   -orig-id: SHT_AARCH64_ATTRIBUTES
+    #   doc: AArch64 build attributes
+    #   doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/aarch64.h#L37
     0x70000004:
       id: arm_debugoverlay
-      doc-ref: https://github.com/illumos/illumos-gate/blob/1d806c5f41/usr/src/boot/sys/sys/elf_common.h#L425
+      -orig-id: SHT_ARM_DEBUGOVERLAY
+      doc: Overlay debug info
+      doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/arm.h#L83
+    # 0x70000004:
+    #   id: aarch64_auth_relr
+    #   -orig-id: SHT_AARCH64_AUTH_RELR
+    #   doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/aarch64.h#L40
     0x70000005:
       id: arm_overlaysection
-      doc-ref: https://github.com/illumos/illumos-gate/blob/1d806c5f41/usr/src/boot/sys/sys/elf_common.h#L426
-    # 0x7fffffff: hi_proc
-    # 0x80000000: lo_user
-    # 0xffffffff: hi_user
+      -orig-id: SHT_ARM_OVERLAYSECTION
+      doc: GDB and overlay integration info
+      doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/arm.h#L84
+    0x70000007:
+      id: aarch64_memtag_globals_static
+      -orig-id: SHT_AARCH64_MEMTAG_GLOBALS_STATIC
+      doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/aarch64.h#L43
+    0x70000008:
+      id: aarch64_memtag_globals_dynamic
+      -orig-id: SHT_AARCH64_MEMTAG_GLOBALS_DYNAMIC
+      doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/aarch64.h#L44
+    # 0x7fffffff:
+    #   id: hi_proc
+    #   -orig-id: SHT_HIPROC
+    #   doc: Last of processor-specific semantics
+    # 0x80000000:
+    #   id: lo_user
+    #   -orig-id: SHT_LOUSER
+    #   doc: First of application-specific semantics
+    # 0xffffffff:
+    #   id: hi_user
+    #   -orig-id: SHT_HIUSER
+    #   doc: Last of application-specific semantics
   # Reserved values of a symbol version index - see the `versym_section` type.
   #
   # https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/symversion.html#SYMVERTBL
