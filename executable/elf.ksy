@@ -2679,9 +2679,10 @@ enums:
       id: moxie_old
       -orig-id: EM_MOXIE_OLD
       doc: Old, unofficial value for Moxie
-  # https://forge.sourceware.org/glibc/glibc-mirror/src/tag/glibc-2.43/elf/elf.h#L715
   # https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/common.h#L472
+  # https://forge.sourceware.org/glibc/glibc-mirror/src/tag/glibc-2.43/elf/elf.h#L715
   # https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/program-header.html#GUID-49F99618-9CDC-4A08-A94C-E2AA264AA01A__CHAPTER6-69880
+  # https://github.com/llvm/llvm-project/blob/ca7933e47d3a3451d81e72ac174dcb5aa28b59d1/llvm/include/llvm/BinaryFormat/ELF.h#L1555 (Git tag "llvmorg-22.1.8")
   ph_type:
     0:
       id: null_type
@@ -2715,7 +2716,10 @@ enums:
       id: tls
       -orig-id: PT_TLS
       doc: Thread-local storage segment
-    # 0x60000000: lo_os
+    # 0x60000000:
+    #   id: lo_os
+    #   -orig-id: PT_LOOS
+    #   doc: First of OS-specific semantics
     0x6464e550:
       id: sunw_unwind
       -orig-id: PT_SUNW_UNWIND
@@ -2744,12 +2748,99 @@ enums:
       id: gnu_sframe
       -orig-id: PT_GNU_SFRAME
       doc: GNU SFrame stack trace segment (`.sframe` section)
+    # 0x6474e555:
+    #   id: gnu_mbind_lo
+    #   -orig-id: PT_GNU_MBIND_LO
+    # 0x6474f554:
+    #   id: gnu_mbind_hi
+    #   -orig-id: PT_GNU_MBIND_HI
     0x65041580:
       id: pax_flags
       -orig-id: PT_PAX_FLAGS
       doc: PaX flags
-    # 0x6fffffff: hi_os
-    # 0x70000000: lo_proc
+    0x65a3dbe5:
+      id: openbsd_mutable
+      -orig-id: PT_OPENBSD_MUTABLE
+      doc: Like bss, but not immutable
+    0x65a3dbe6:
+      id: openbsd_randomize
+      -orig-id: PT_OPENBSD_RANDOMIZE
+      doc: Fill with random data
+    0x65a3dbe7:
+      id: openbsd_wxneeded
+      -orig-id: PT_OPENBSD_WXNEEDED
+      doc: Program does W^X violations
+    0x65a3dbe8:
+      id: openbsd_nobtcfi
+      -orig-id: PT_OPENBSD_NOBTCFI
+      doc: No branch target CFI
+    0x65a3dbe9:
+      id: openbsd_syscalls
+      -orig-id: PT_OPENBSD_SYSCALLS
+      doc: System call sites
+    0x65a41be6:
+      id: openbsd_bootdata
+      -orig-id: PT_OPENBSD_BOOTDATA
+      doc: Section for boot arguments
+    # 0x6ffffff7:
+    #   id: lo_sunw
+    #   -orig-id: PT_LOSUNW
+    #   doc: First of Solaris semantics
+    #   doc-ref: https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/program-header.html#GUID-49F99618-9CDC-4A08-A94C-E2AA264AA01A__CHAPTER6-69880
+    0x6ffffff7:
+      id: sunw_sysstat_zone
+      -orig-id: PT_SUNW_SYSSTAT_ZONE
+      doc: Reserved for internal use
+      # NB: <https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/program-header.html#GUID-49F99618-9CDC-4A08-A94C-E2AA264AA01A__CHAPTER6-69880>
+      # claims that both `PT_SUNW_SYSSTAT_ZONE` and `PT_SUNW_SYSSTAT` have the
+      # value `0x6ffffff8`, which is nonsense, since they obviously must have
+      # different values. And indeed, `/usr/include/sys/elf.h` contains
+      # `#define PT_SUNW_SYSSTAT_ZONE 0x6ffffff7`.
+      doc-ref: '`/usr/include/sys/elf.h` on Oracle Solaris 11.4'
+    0x6ffffff8:
+      id: sunw_sysstat
+      -orig-id: PT_SUNW_SYSSTAT
+      doc: Reserved for internal use
+    0x6ffffff9:
+      id: sunw_reserve
+      -orig-id: PT_SUNW_RESERVE
+      doc: Memory reservation
+    0x6ffffffa:
+      id: sunw_bss
+      -orig-id:
+        - PT_SUNW_BSS
+        - PT_SUNWBSS # old name
+    0x6ffffffb:
+      id: sunw_stack
+      -orig-id:
+        - PT_SUNW_STACK
+        - PT_SUNWSTACK # old name
+      doc: Describes the stack segment
+    0x6ffffffc:
+      id: sunw_dtrace
+      -orig-id:
+        - PT_SUNW_DTRACE
+        - PT_SUNWDTRACE # old name
+      doc: Reserved for internal use by `dtrace(8)`
+    0x6ffffffd:
+      id: sunw_cap
+      -orig-id:
+        - PT_SUNW_CAP
+        - PT_SUNWCAP # old name
+      doc: Capability requirements
+    # 0x6fffffff:
+    #   id: hi_sunw
+    #   -orig-id: PT_HISUNW
+    #   doc: Last of Solaris semantics
+    #   doc-ref: https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/program-header.html#GUID-49F99618-9CDC-4A08-A94C-E2AA264AA01A__CHAPTER6-69880
+    # 0x6fffffff:
+    #   id: hi_os
+    #   -orig-id: PT_HIOS
+    #   doc: Last of OS-specific semantics
+    # 0x70000000:
+    #   id: lo_proc
+    #   -orig-id: PT_LOPROC
+    #   doc: First of processor-specific semantics
     0x70000000:
       id: arm_archext
       -orig-id: PT_ARM_ARCHEXT
@@ -2757,6 +2848,10 @@ enums:
       doc-ref:
         - https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/arm.h#L40
         - https://github.com/ARM-software/abi-aa/blob/daa7a94ca55973736c0e434a67a6e4bbcd35d7fa/aaelf32/aaelf32.rst#61program-header Git tag "2025Q4"
+    # 0x70000000:
+    #   id: aarch64_archext
+    #   -orig-id: PT_AARCH64_ARCHEXT
+    #   doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/aarch64.h#L28
     0x70000001:
       id: arm_exidx
       -orig-id:
@@ -2766,7 +2861,20 @@ enums:
       doc-ref:
         - https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/arm.h#L41
         - https://github.com/ARM-software/abi-aa/blob/daa7a94ca55973736c0e434a67a6e4bbcd35d7fa/aaelf32/aaelf32.rst#61program-header Git tag "2025Q4"
-    # 0x7fffffff: hi_proc
+    0x70000002:
+      id: aarch64_memtag_mte
+      -orig-id: PT_AARCH64_MEMTAG_MTE
+      doc: MTE memory tags
+      doc-ref: https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/aarch64.h#L31
+    0x70000003:
+      id: riscv_attributes
+      -orig-id: PT_RISCV_ATTRIBUTES
+      doc: RISC-V ELF attribute section (deprecated)
+      doc-ref: https://github.com/riscv-non-isa/riscv-elf-psabi-doc/blob/01017c343cd6d89ed4d1d568b1c75fac79d2a689/riscv-elf.adoc#program-header-table
+    # 0x7fffffff:
+    #   id: hi_proc
+    #   -orig-id: PT_HIPROC
+    #   doc: Last of processor-specific semantics
   # https://forge.sourceware.org/binutils-gdb/binutils-gdb-mirror/src/tag/binutils-2_46_1/include/elf/common.h#L526
   # https://github.com/llvm/llvm-project/blob/ca7933e47d3a3451d81e72ac174dcb5aa28b59d1/llvm/include/llvm/BinaryFormat/ELF.h#L1144 (Git tag "llvmorg-22.1.8")
   # https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/section-headers.html#GUID-2CBE4879-2E76-426E-BB7F-CF0CB1D87C52__CHAPTER6-73445
@@ -2846,7 +2954,7 @@ enums:
     # 0x60000000:
     #   id: lo_os
     #   -orig-id: SHT_LOOS
-    #   doc: First of OS specific semantics
+    #   doc: First of OS-specific semantics
     0x60000001:
       id: android_rel
       -orig-id: SHT_ANDROID_REL
@@ -3043,7 +3151,7 @@ enums:
     # 0x6fffffff:
     #   id: hi_os
     #   -orig-id: SHT_HIOS
-    #   doc: Last of OS specific semantics
+    #   doc: Last of OS-specific semantics
     # 0x70000000:
     #   id: lo_proc
     #   -orig-id: SHT_LOPROC
