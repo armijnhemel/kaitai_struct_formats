@@ -43,11 +43,11 @@ types:
       - id: magic
         type: u2
         valid: 42
-      - id: ifd0_ofs
+      - id: ofs_ifd0
         type: u4
     instances:
       ifd0:
-        pos: ifd0_ofs
+        pos: ofs_ifd0
         type: ifd
     types:
       ifd:
@@ -58,13 +58,13 @@ types:
             type: ifd_field
             repeat: expr
             repeat-expr: num_fields
-          - id: next_ifd_ofs
+          - id: ofs_next_ifd
             type: u4
         instances:
           next_ifd:
-            pos: next_ifd_ofs
+            pos: ofs_next_ifd
             type: ifd
-            if: next_ifd_ofs != 0
+            if: ofs_next_ifd != 0
       ifd_field:
         seq:
           - id: tag
