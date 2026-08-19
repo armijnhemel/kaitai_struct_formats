@@ -40,8 +40,9 @@ types:
           0x4949: le
           0x4d4d: be
     seq:
-      - id: version
+      - id: magic
         type: u2
+        valid: 42
       - id: ifd0_ofs
         type: u4
     instances:
