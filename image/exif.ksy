@@ -79,7 +79,7 @@ types:
             type: u4
         instances:
           type_byte_length:
-            value: 'field_type == field_type::word ? 2 : (field_type == field_type::dword ? 4 : 1)'
+            value: 'field_type == field_type::short ? 2 : (field_type == field_type::long ? 4 : 1)'
           byte_length:
             value: length * type_byte_length
           is_immediate_data:
@@ -92,9 +92,9 @@ types:
 enums:
   field_type:
     1: byte
-    2: ascii_string
-    3: word
-    4: dword
+    2: ascii
+    3: short
+    4: long
     5: rational
     7: undefined
     9: slong
