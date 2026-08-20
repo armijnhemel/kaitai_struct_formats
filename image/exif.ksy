@@ -90,15 +90,80 @@ types:
             size: byte_length
             if: not is_immediate_data
 enums:
+  # https://github.com/exiftool/exiftool/blob/2200871d9cef988051d2a99d67df3bda6cbb30a8/lib/Image/ExifTool/Exif.pm#L94-L122 (Git tag "13.59")
+  # https://www.media.mit.edu/pia/Research/deepview/exif.html#DataForm
   field_type:
     1: byte
     2: ascii
     3: short
     4: long
     5: rational
+    6:
+      id: sbyte
+      -orig-id: SBYTE
+      doc: |
+        8-bit signed integer.
+
+        This type is missing from the official Exif specification, but
+        it's part of TIFF 6.0. There's no known Exif tag of this type in
+        the [standard
+        namespace](https://exiftool.sourceforge.net/TagNames/EXIF.html)
+        (there's no occurrence of `int8s` on the page), but it's used by
+        many vendor-specific tags in `MakerNote` sub-IFDs, for example
+        [Nikon](https://exiftool.sourceforge.net/TagNames/Nikon.html)
+        (search for `int8s`).
+
+        Unfortunately, this implementation doesn't parse the contents of
+        `MakerNote` tags (`tag::maker_note`) yet.
     7: undefined
+    8:
+      id: sshort
+      -orig-id: SSHORT
+      doc: |
+        16-bit signed integer.
+
+        This type is missing from the official Exif specification, but
+        it's part of TIFF 6.0 and some tags use it, for example
+        `TimeZoneOffset` (`tag::time_zone_offset`).
     9: slong
     10: srational
+    11:
+      id: float
+      -orig-id: FLOAT
+      doc: |
+        Single precision (4-byte) IEEE 754 float.
+
+        This type is missing from the official Exif specification, but
+        it's part of TIFF 6.0 and some tags use it, for example
+        `ProfileToneCurve` (`tag::profile_tone_curve`).
+    12:
+      id: double
+      -orig-id: DOUBLE
+      doc: |
+        Double precision (8-byte) IEEE 754 float.
+
+        This type is missing from the official Exif specification, but
+        it's part of TIFF 6.0 and some tags use it, for example
+        `NoiseProfile` (`tag::noise_profile`).
+    13:
+      id: ifd
+      -orig-id: IFD
+      doc: |
+        Offset of an IFD (32-bit unsigned integer).
+
+        This type is missing from the official Exif specification, but
+        it was defined in the [TIFF Technical Note
+        1](https://www.alternatiff.com/resources/TIFFPM6.pdf) (page 4).
+        There's no known Exif tag of this type in the [standard
+        namespace](https://exiftool.sourceforge.net/TagNames/EXIF.html)
+        (there's no occurrence of `ifd` on the page), but there are some
+        Olympus-specific tags in `MakerNote` sub-IFDs, e.g.
+        `EquipmentIFD` or `CameraSettingsIFD`. See
+        <https://github.com/exiftool/exiftool/blob/2200871d9cef988051d2a99d67df3bda6cbb30a8/lib/Image/ExifTool/Olympus.pm>
+        (Git tag "13.59") - search for `'ifd'`. See also the sample file
+        <https://github.com/exiftool/exiftool/blob/2200871d9cef988051d2a99d67df3bda6cbb30a8/t/images/Olympus2.jpg>,
+        which contains these tags.
+    129: utf8
   tag:
     0x0100: image_width
     0x0101: image_height
