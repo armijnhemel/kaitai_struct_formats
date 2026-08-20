@@ -69,17 +69,17 @@ types:
         seq:
           - id: tag
             type: u2
-            enum: tag_enum
+            enum: tag
           - id: field_type
             type: u2
-            enum: field_type_enum
+            enum: field_type
           - id: length
             type: u4
           - id: ofs_or_data
             type: u4
         instances:
           type_byte_length:
-            value: 'field_type == field_type_enum::word ? 2 : (field_type == field_type_enum::dword ? 4 : 1)'
+            value: 'field_type == field_type::word ? 2 : (field_type == field_type::dword ? 4 : 1)'
           byte_length:
             value: length * type_byte_length
           is_immediate_data:
@@ -90,7 +90,7 @@ types:
             size: byte_length
             if: not is_immediate_data
 enums:
-  field_type_enum:
+  field_type:
     1: byte
     2: ascii_string
     3: word
@@ -99,7 +99,7 @@ enums:
     7: undefined
     9: slong
     10: srational
-  tag_enum:
+  tag:
     0x0100: image_width
     0x0101: image_height
     0x0102: bits_per_sample
