@@ -66,6 +66,7 @@ types:
             type: ifd
             if: ofs_next_ifd != 0
       ifd_field:
+        -webide-representation: '{tag}'
         seq:
           - id: tag
             type: u2
