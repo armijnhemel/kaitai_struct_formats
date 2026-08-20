@@ -89,6 +89,11 @@ types:
             pos: ofs_or_data
             size: byte_length
             if: not is_immediate_data
+          sub_ifd:
+            io: _root._io
+            pos: ofs_or_data
+            type: ifd
+            if: tag == tag::exif_offset or tag == tag::interop_offset
 enums:
   # https://github.com/exiftool/exiftool/blob/2200871d9cef988051d2a99d67df3bda6cbb30a8/lib/Image/ExifTool/Exif.pm#L94-L122 (Git tag "13.59")
   # https://www.media.mit.edu/pia/Research/deepview/exif.html#DataForm
@@ -165,6 +170,11 @@ enums:
         which contains these tags.
     129: utf8
   tag:
+    0x0001: interop_index
+    0x0002:
+      id: interop_version
+      doc: Interoperability Version (not in the Exif spec, but used in practice)
+      doc-ref: https://github.com/exiftool/exiftool/blob/2200871d9cef988051d2a99d67df3bda6cbb30a8/lib/Image/ExifTool/Exif.pm#L429-L437 Git tag "13.59"
     0x0100: image_width
     0x0101: image_height
     0x0102: bits_per_sample
