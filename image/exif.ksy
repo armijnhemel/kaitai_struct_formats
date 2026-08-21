@@ -55,6 +55,7 @@ types:
           - id: num_fields
             type: u2
           - id: fields
+            size: 12
             type: ifd_field
             repeat: expr
             repeat-expr: num_fields
@@ -74,12 +75,13 @@ types:
           - id: field_type
             type: u2
             enum: field_type
-          - id: length
+          - id: num_values
             type: u4
-          - id: ofs_or_data
+          - id: ofs_data
             type: u4
+            if: not has_immediate_data
         instances:
-          type_byte_length:
+          bytes_per_value:
             value: |
               field_type == field_type::byte or
               field_type == field_type::ascii or
@@ -105,20 +107,20 @@ types:
               `field_type` is not one of the known types (in which case the size
               cannot be determined and `data` will be empty).
             doc-ref: https://www.media.mit.edu/pia/Research/deepview/exif.html#DataForm
-          byte_length:
-            value: length * type_byte_length
-          is_immediate_data:
-            value: 'byte_length <= 4'
+          len_data:
+            value: bytes_per_value * num_values
+          has_immediate_data:
+            value: 'len_data <= 4'
           data:
-            io: _root._io
-            pos: ofs_or_data
-            size: byte_length
-            if: not is_immediate_data
-          sub_ifd:
-            io: _root._io
-            pos: ofs_or_data
-            type: ifd
-            if: tag == tag::exif_offset or tag == tag::interop_offset
+            io: 'has_immediate_data ? _io : _root._io'
+            pos: 'has_immediate_data ? 8 : ofs_data'
+            size: len_data
+            -webide-parse-mode: eager
+          # sub_ifd:
+          #   io: _root._io
+          #   pos: ofs_or_data
+          #   type: ifd
+          #   if: tag == tag::exif_offset or tag == tag::interop_offset
 enums:
   # https://github.com/exiftool/exiftool/blob/2200871d9cef988051d2a99d67df3bda6cbb30a8/lib/Image/ExifTool/Exif.pm#L94-L122 (Git tag "13.59")
   # https://www.media.mit.edu/pia/Research/deepview/exif.html#DataForm
