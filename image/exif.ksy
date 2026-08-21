@@ -48,9 +48,12 @@ types:
     instances:
       ifd0:
         pos: ofs_ifd0
-        type: ifd
+        type: ifd(false)
     types:
       ifd:
+        params:
+          - id: is_gps_ifd
+            type: bool
         seq:
           - id: num_fields
             type: u2
@@ -64,14 +67,16 @@ types:
         instances:
           next_ifd:
             pos: ofs_next_ifd
-            type: ifd
+            type: ifd(is_gps_ifd)
             if: ofs_next_ifd != 0
       ifd_field:
-        -webide-representation: '{tag}'
+        -webide-representation: '{tag} {gps_tag}'
         seq:
-          - id: tag
+          - id: tag_raw
             type: u2
-            enum: tag
+            doc: |
+              Raw numeric tag. Don't read this field - access `tag` or `gps_tag`
+              instead.
           - id: field_type
             type: u2
             enum: field_type
@@ -81,6 +86,14 @@ types:
             type: u4
             if: not has_immediate_data
         instances:
+          tag:
+            value: tag_raw
+            enum: tag
+            if: not _parent.is_gps_ifd
+          gps_tag:
+            value: tag_raw
+            enum: gps_tag
+            if: _parent.is_gps_ifd
           bytes_per_value:
             value: |
               field_type == field_type::byte or
@@ -134,11 +147,15 @@ types:
           sub_ifd:
             io: _root._io
             pos: data.as<longs>.values.first
-            type: ifd
+            type: ifd(tag == tag::gps_info)
             if: |
               field_type == field_type::long and
               num_values == 1 and
-              (tag == tag::exif_offset or tag == tag::interop_offset)
+              (
+                tag == tag::exif_offset or
+                tag == tag::interop_offset or
+                tag == tag::gps_info
+              )
       ascii_string:
         -webide-representation: '{value}'
         seq:
@@ -306,6 +323,40 @@ enums:
         <https://github.com/exiftool/exiftool/blob/2200871d9cef988051d2a99d67df3bda6cbb30a8/t/images/Olympus2.jpg>,
         which contains these tags.
     129: utf8
+  # https://exiftool.sourceforge.net/TagNames/GPS.html
+  gps_tag:
+    0x0000: gps_version_id
+    0x0001: gps_latitude_ref
+    0x0002: gps_latitude
+    0x0003: gps_longitude_ref
+    0x0004: gps_longitude
+    0x0005: gps_altitude_ref
+    0x0006: gps_altitude
+    0x0007: gps_time_stamp
+    0x0008: gps_satellites
+    0x0009: gps_status
+    0x000a: gps_measure_mode
+    0x000b: gps_dop
+    0x000c: gps_speed_ref
+    0x000d: gps_speed
+    0x000e: gps_track_ref
+    0x000f: gps_track
+    0x0010: gps_img_direction_ref
+    0x0011: gps_img_direction
+    0x0012: gps_map_datum
+    0x0013: gps_dest_latitude_ref
+    0x0014: gps_dest_latitude
+    0x0015: gps_dest_longitude_ref
+    0x0016: gps_dest_longitude
+    0x0017: gps_dest_bearing_ref
+    0x0018: gps_dest_bearing
+    0x0019: gps_dest_distance_ref
+    0x001a: gps_dest_distance
+    0x001b: gps_processing_method
+    0x001c: gps_area_information
+    0x001d: gps_date_stamp
+    0x001e: gps_differential
+    0x001f: gps_h_positioning_error
   tag:
     0x0001: interop_index
     0x0002:
