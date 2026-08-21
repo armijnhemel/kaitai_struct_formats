@@ -80,7 +80,31 @@ types:
             type: u4
         instances:
           type_byte_length:
-            value: 'field_type == field_type::short ? 2 : (field_type == field_type::long ? 4 : 1)'
+            value: |
+              field_type == field_type::byte or
+              field_type == field_type::ascii or
+              field_type == field_type::sbyte or
+              field_type == field_type::undefined or
+              field_type == field_type::utf8
+                ? 1 :
+              field_type == field_type::short or
+              field_type == field_type::sshort
+                ? 2 :
+              field_type == field_type::long or
+              field_type == field_type::slong or
+              field_type == field_type::float or
+              field_type == field_type::ifd
+                ? 4 :
+              field_type == field_type::rational or
+              field_type == field_type::srational or
+              field_type == field_type::double
+                ? 8
+                : 0
+            doc: |
+              Size in bytes of a single value of type `field_type`, or 0 if
+              `field_type` is not one of the known types (in which case the size
+              cannot be determined and `data` will be empty).
+            doc-ref: https://www.media.mit.edu/pia/Research/deepview/exif.html#DataForm
           byte_length:
             value: length * type_byte_length
           is_immediate_data:
