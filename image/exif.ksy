@@ -115,12 +115,122 @@ types:
             io: 'has_immediate_data ? _io : _root._io'
             pos: 'has_immediate_data ? 8 : ofs_data'
             size: len_data
+            type:
+              switch-on: field_type
+              cases:
+                field_type::ascii: ascii_string
+                field_type::utf8: utf8_string
+                field_type::sbyte: sbytes
+                field_type::short: shorts
+                field_type::sshort: sshorts
+                field_type::long: longs
+                field_type::slong: slongs
+                field_type::rational: rationals
+                field_type::srational: srationals
+                field_type::float: floats
+                field_type::double: doubles
+                field_type::ifd: longs
             -webide-parse-mode: eager
-          # sub_ifd:
-          #   io: _root._io
-          #   pos: ofs_or_data
-          #   type: ifd
-          #   if: tag == tag::exif_offset or tag == tag::interop_offset
+          sub_ifd:
+            io: _root._io
+            pos: data.as<longs>.values.first
+            type: ifd
+            if: |
+              field_type == field_type::long and
+              num_values == 1 and
+              (tag == tag::exif_offset or tag == tag::interop_offset)
+      ascii_string:
+        -webide-representation: '{value}'
+        seq:
+          - id: value
+            type: strz
+            encoding: ASCII
+            eos-error: false
+      utf8_string:
+        -webide-representation: '{value}'
+        seq:
+          - id: value
+            type: strz
+            encoding: UTF-8
+            eos-error: false
+      sbytes:
+        seq:
+          - id: values
+            type: s1
+            repeat: expr
+            repeat-expr: _parent.num_values
+      shorts:
+        seq:
+          - id: values
+            type: u2
+            repeat: expr
+            repeat-expr: _parent.num_values
+      sshorts:
+        seq:
+          - id: values
+            type: s2
+            repeat: expr
+            repeat-expr: _parent.num_values
+      longs:
+        seq:
+          - id: values
+            type: u4
+            repeat: expr
+            repeat-expr: _parent.num_values
+      slongs:
+        seq:
+          - id: values
+            type: s4
+            repeat: expr
+            repeat-expr: _parent.num_values
+      rationals:
+        seq:
+          - id: values
+            type: rational
+            repeat: expr
+            repeat-expr: _parent.num_values
+      rational:
+        -webide-representation: '{value:dec}'
+        seq:
+          - id: value_num
+            type: u4
+            doc: Numerator
+          - id: value_den
+            type: u4
+            doc: Denominator
+        instances:
+          value:
+            value: (value_num + 0.0) / value_den
+      srationals:
+        seq:
+          - id: values
+            type: srational
+            repeat: expr
+            repeat-expr: _parent.num_values
+      srational:
+        -webide-representation: '{value:dec}'
+        seq:
+          - id: value_num
+            type: s4
+            doc: Numerator
+          - id: value_den
+            type: s4
+            doc: Denominator
+        instances:
+          value:
+            value: (value_num + 0.0) / value_den
+      floats:
+        seq:
+          - id: values
+            type: f4
+            repeat: expr
+            repeat-expr: _parent.num_values
+      doubles:
+        seq:
+          - id: values
+            type: f8
+            repeat: expr
+            repeat-expr: _parent.num_values
 enums:
   # https://github.com/exiftool/exiftool/blob/2200871d9cef988051d2a99d67df3bda6cbb30a8/lib/Image/ExifTool/Exif.pm#L94-L122 (Git tag "13.59")
   # https://www.media.mit.edu/pia/Research/deepview/exif.html#DataForm
