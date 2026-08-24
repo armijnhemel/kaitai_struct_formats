@@ -160,9 +160,32 @@ types:
         -webide-representation: '{value}'
         seq:
           - id: value
-            type: strz
-            encoding: ASCII
+            terminator: 0
             eos-error: false
+            doc: |
+              According to the core Exif standard, this should be ASCII, but in
+              practice, this is not always the case. From
+              [ExifTool FAQ](https://exiftool.sourceforge.net/faq.html#Q10):
+
+              > However, it is not uncommon for applications to write UTF-8 or
+              other encodings where ASCII is expected.
+
+              Therefore, this field is a byte array, not a string. This is to
+              avoid non-ASCII characters being treated as errors in some target
+              languages, such as Python. The only assumption is that a null byte
+              terminates the value (although sometimes the null byte is missing,
+              which we tolerate thanks to the `eos-error: false` setting).
+
+              Here is a sample JPEG file with a `tag::image_description` IFD
+              field of type `field_type::ascii` that actually contains UTF-8:
+              <https://github.com/Exiv2/exiv2/blob/2cd987a731236037b6b78cbff897d08685a8ef49/test/data/exiv2-bug501.jpg>
+
+              It seems that most modern applications (e.g. GIMP 3.0.6) always
+              use UTF-8 when storing Exif metadata. However, there are also
+              files with a non-UTF-8 encoding, for example
+              <https://github.com/drewnoakes/metadata-extractor-images/blob/651ad0e67aa8d43d358ad05f9bc07b52d8b9ac6e/jpg/Ricoh%20DC-3Z%20(low%20res).jpg>
+              has a `tag::copyright` IFD field with a value encoded in
+              ISO-8859-1 (Latin-1).
       utf8_string:
         -webide-representation: '{value}'
         seq:
