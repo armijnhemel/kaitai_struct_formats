@@ -241,6 +241,15 @@ types:
         instances:
           value:
             value: (value_num + 0.0) / value_den
+            if: value_den != 0
+            doc: |
+              If denominator is zero, this instance is disabled to prevent
+              `ZeroDivisionError` in Python.
+
+              Here's a sample file with a zero denominator in the IFD fields
+              `tag::x_resolution` and `tag::y_resolution` (both of which are of
+              type `field_type::rational`):
+              <https://github.com/python-pillow/Pillow/blob/807d689a83738027b6f6e0f219a6a6dd30e01c08/Tests/images/exif-dpi-zerodivision.jpg>
       srationals:
         seq:
           - id: values
@@ -259,6 +268,14 @@ types:
         instances:
           value:
             value: (value_num + 0.0) / value_den
+            if: value_den != 0
+            doc: |
+              If denominator is zero, this instance is disabled to prevent
+              `ZeroDivisionError` in Python.
+
+              Here's a sample file with a zero denominator in the IFD field
+              `tag::exposure_compensation` of type `field_type::srational`:
+              <https://github.com/drewnoakes/metadata-extractor-images/blob/651ad0e67aa8d43d358ad05f9bc07b52d8b9ac6e/jpg/Reconyx%20Hyperfire%20HP4K.jpg>
       floats:
         seq:
           - id: values
