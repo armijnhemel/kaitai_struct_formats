@@ -230,7 +230,7 @@ types:
             repeat: expr
             repeat-expr: _parent.num_values
       rational:
-        -webide-representation: '{value:dec}'
+        -webide-representation: '{value:dec} (= {value_num:dec}/{value_den:dec})'
         seq:
           - id: value_num
             type: u4
@@ -257,7 +257,7 @@ types:
             repeat: expr
             repeat-expr: _parent.num_values
       srational:
-        -webide-representation: '{value:dec}'
+        -webide-representation: '{value:dec} (= {value_num:dec}/{value_den:dec})'
         seq:
           - id: value_num
             type: s4
