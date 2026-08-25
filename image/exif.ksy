@@ -146,16 +146,38 @@ types:
             -webide-parse-mode: eager
           sub_ifd:
             io: _root._io
-            pos: data.as<longs>.values.first
+            pos: |
+              field_type == field_type::slong
+                ? data.as<slongs>.values.first.as<u4>
+                : data.as<longs>.values.first
             type: ifd(tag == tag::gps_info)
             if: |
-              field_type == field_type::long and
               num_values == 1 and
+              (
+                field_type == field_type::long or
+                field_type == field_type::ifd or
+                (field_type == field_type::slong and data.as<slongs>.values.first >= 0)
+              ) and
               (
                 tag == tag::exif_offset or
                 tag == tag::interop_offset or
                 tag == tag::gps_info
               )
+            doc: |
+              All the "IFD Pointer" tags (as the core Exif standard calls them),
+              i.e. `ExifOffset`, `InteropOffset` and `GPSInfo` (using the
+              [ExifTool's
+              names](https://exiftool.sourceforge.net/TagNames/EXIF.html)),
+              should be of type `LONG` (`field_type::long`). However, the type
+              `SLONG` (`field_type::slong`) type has also been observed:
+              <https://github.com/Exiv2/exiv2/blob/2cd987a731236037b6b78cbff897d08685a8ef49/test/data/FurnaceCreekInn.jpg>
+
+              Both ExifTool and Exiv2 accept `LONG`, `SLONG` and also `IFD`.
+              Exiv2 specifically supports only these three types - see
+              <https://github.com/Exiv2/exiv2/blob/2cd987a731236037b6b78cbff897d08685a8ef49/src/tiffvisitor_int.cpp#L1141>
+              (Git tag "v0.28.8"). ExifTool is more lenient - it even accepts
+              any integer type. In practice, real files most likely only use one
+              of the three types supported by Exiv2, so we stick with that.
       ascii_string:
         -webide-representation: '{value}'
         seq:
