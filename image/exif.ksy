@@ -17,6 +17,16 @@ meta:
       - Q196465 # Exchangeable image file format
   license: CC0-1.0
   ks-version: '0.9'
+doc: |
+  Sample files (numbers in parentheses show how many files per extension contain
+  Exif metadata out of the total):
+
+  * <https://github.com/ianare/exif-py/tree/a69bf74770caf6b333221658f5092ed69f99faac/tests/resources/jpg> (84/93 .jpg, 1/1 .jpeg)
+  * <https://github.com/exiftool/exiftool/tree/2200871d9cef988051d2a99d67df3bda6cbb30a8/t/images> (34/41 .jpg, 0/1 .png)
+  * <https://github.com/Exiv2/exiv2/tree/648ada43dcb35ce6077f38183ace52d5e2071f64/test/data> (85/155 .jpg, 5/23 .png)
+  * <https://github.com/python-pillow/Pillow/tree/807d689a83738027b6f6e0f219a6a6dd30e01c08/Tests/images> (36/55 .jpg, 3/420 .png)
+  * <https://github.com/drewnoakes/metadata-extractor-images/tree/651ad0e67aa8d43d358ad05f9bc07b52d8b9ac6e/jpg> (335/430 .jpg)
+  * <https://github.com/libexif/libexif-testsuite/tree/8c1f5bbc18d2cbc80b01b3f9b3eb29546310acf2> (15/18 .jpg)
 doc-ref:
   - https://www.cipa.jp/std/documents/download_e.html?CIPA_DC-008-2026-E Exif Version 3.1
   - https://www.cipa.jp/std/documents/download_e.html?CIPA_DC-008-2024-E Exif Version 3.0
