@@ -3038,6 +3038,7 @@ enums:
       id: llvm_dyndbg_elf
       -orig-id: SHT_LLVM_DYNDBG_ELF
       doc: LLVM Dynamic Debugging ELF
+      doc-ref: https://github.com/llvm/llvm-project/blob/30ad5cc8f094a248b883e613f523925c63c666b8/llvm/include/llvm/BinaryFormat/ELF.h#L1200
     0x6fffff00:
       id: android_relr
       -orig-id: SHT_ANDROID_RELR
