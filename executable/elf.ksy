@@ -528,6 +528,28 @@ types:
             # headers with `len_body == 0` to have a valid body would lead to
             # parse errors.
             if: len_body != 0
+            doc: |
+              Note: a program header may not have a valid body in the same ELF
+              file, so accessing `body` may result in reading garbage or
+              triggering EOF errors.
+
+              In particular, `*.debug` files produced by elfutils'
+              `eu-strip --strip-debug` (as used by Fedora/RHEL and other
+              RPM-based distros for their `*-debuginfo` packages, e.g.
+              `glibc-debuginfo`) copy the original binary's program header table
+              verbatim, including `ofs_body`/`len_body` (i.e.
+              `p_offset`/`p_filesz`), while dropping the actual contents of most
+              segments. Such segments can be recognized by the fact that the
+              corresponding section headers have type `sh_type::nobits`
+              (`SHT_NOBITS`). However, this Kaitai Struct implementation doesn't
+              know the mapping between program headers and section headers, so
+              this must be handled externally.
+
+              `*.debug` files from Debian/Ubuntu `*-dbg` packages (e.g.
+              `libc6-dbg`) are usually not affected by this issue, because they
+              are produced using GNU Binutils (`objcopy --only-keep-debug`),
+              which zeroes `len_body` for segments whose contents were omitted
+              (which reliably tells us that there is no `body`).
           flags_obj:
             type:
               switch-on: _root.bits
