@@ -292,45 +292,64 @@ types:
   compressed_integer:
     doc: |
       Like `/common/vlq_base128_le` (LEB128), but the logic of the
-      "continuation" flag in the most significant bit is inverted, so `has_next`
-      is implemented the opposite way (if the highest bit is set to zero, it
+      "continuation" flag in the most significant bit is inverted, so instead of
+      `has_next`, it is called `is_last` (if the highest bit is set to zero, it
       means "continue", whereas in standard LEB128, the highest bit set to
       **one** means "continue"). Therefore, we cannot simply import
       `/common/vlq_base128_le` and use it, because it is incompatible.
     -webide-representation: '{value:hex} = {value:dec}'
     seq:
       - id: groups
-        type: group
+        type: group(_index)
         repeat: until
-        repeat-until: not _.has_next
+        repeat-until: _.is_last
     types:
       group:
+        meta:
+          bit-endian: be
         doc: |
           One byte group, clearly divided into 7-bit "value" chunk and 1-bit "continuation" flag.
         -webide-representation: '{value}'
+        params:
+          - id: idx
+            type: s4
         seq:
-          - id: b
-            type: u1
-        instances:
-          has_next:
-            value: (b & 0b1000_0000) == 0
-            doc: If true, then we have more bytes to read
-          value:
-            value: b & 0b0111_1111
-            doc: The 7-bit (base128) numeric value chunk of this group
+          - id: is_last
+            type: b1
+            valid: 'idx == 9 ? true : is_last'
+            doc: |
+              If `true`, then this is the last byte of the compressed integer.
+
+              Since this implementation only supports serialized values up to 10
+              bytes, this must be `true` in the 10th group (`groups[9]`).
+          - id: value
+            type: b7
+            valid:
+              # See the comment in `/common/vlq_base128_le.ksy` for why the
+              # `.as<u8>` is needed (it's a workaround for a bug in KSC 0.11).
+              max: '(idx == 9 ? 1 : 0b111_1111).as<u8>'
+            doc: |
+              The 7-bit (base128) numeric value chunk of this group
+
+              Since this implementation only supports integer values up to 64 bits,
+              the `value` in the 10th group (`groups[9]`) can only be `0` or `1`
+              (otherwise the width of the represented value would be 65 bits or
+              more, which is not supported).
     instances:
       len:
         value: groups.size
       value:
-        value: >-
-          groups[0].value
-          + (len >= 2 ? (groups[1].value << 7) : 0)
-          + (len >= 3 ? (groups[2].value << 14) : 0)
-          + (len >= 4 ? (groups[3].value << 21) : 0)
-          + (len >= 5 ? (groups[4].value << 28) : 0)
-          + (len >= 6 ? (groups[5].value << 35) : 0)
-          + (len >= 7 ? (groups[6].value << 42) : 0)
-          + (len >= 8 ? (groups[7].value << 49) : 0)
+        value: |
+          (groups[0].value
+          | (len >= 2 ? (groups[1].value << 7) : 0)
+          | (len >= 3 ? (groups[2].value << 14) : 0)
+          | (len >= 4 ? (groups[3].value << 21) : 0)
+          | (len >= 5 ? (groups[4].value << 28) : 0)
+          | (len >= 6 ? (groups[5].value << 35) : 0)
+          | (len >= 7 ? (groups[6].value << 42) : 0)
+          | (len >= 8 ? (groups[7].value << 49) : 0)
+          | (len >= 9 ? (groups[8].value << 56) : 0)
+          | (len >= 10 ? (groups[9].value << 63) : 0)).as<u8>
         doc: Resulting unsigned value as normal integer
 enums:
   checksum_types:
