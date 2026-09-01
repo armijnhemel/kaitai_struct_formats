@@ -66,9 +66,11 @@ types:
         -orig-id: numBlocks
         type: u4
       - id: file_size
+        -orig-id: fileSize
         type: u4
         if: flags & 0x00002000 == 0
       - id: family_id
+        -orig-id: familyID
         type: u4
         enum: family_id
         if: flags & 0x00002000 != 0
