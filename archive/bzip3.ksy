@@ -28,8 +28,8 @@ doc: |
   additional block parsing and CRC checks it will be possible to detect invalid
   blocks. This is future work.
 doc-ref:
-  - https://github.com/kspalaiologos/bzip3
-  - https://github.com/kspalaiologos/bzip3/blob/972e6694b815/doc/bzip3_format.md
+  - https://github.com/iczelia/bzip3
+  - https://github.com/iczelia/bzip3/blob/972e6694b815/doc/bzip3_format.md
 seq:
   - id: header
     type: header
