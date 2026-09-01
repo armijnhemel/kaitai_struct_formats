@@ -2,6 +2,8 @@ meta:
   id: uf2
   title: UF2 (USB Flashing Format)
   file-extension: uf2
+  xref:
+    wikidata: Q105856672
   license: CC0-1.0
   endian: le
 doc: |
