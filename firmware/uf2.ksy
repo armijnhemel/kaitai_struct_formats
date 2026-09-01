@@ -1,6 +1,6 @@
 meta:
   id: uf2
-  title: UF2
+  title: UF2 (USB Flashing Format)
   file-extension: uf2
   license: CC0-1.0
   endian: le
