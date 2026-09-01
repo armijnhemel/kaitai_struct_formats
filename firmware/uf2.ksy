@@ -76,7 +76,7 @@ types:
         if: flags & 0x00002000 != 0
       - id: data
         size: 476
-      - id: end_magic
+      - id: final_magic
         -orig-id: magicEnd
         contents: [0x30, 0x6f, 0xb1, 0x0a]
 enums:
