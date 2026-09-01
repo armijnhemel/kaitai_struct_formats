@@ -22,7 +22,7 @@ doc: |
 
   <https://micropython.org/download/rp2-pico/>
 
-doc-ref: https://github.com/microsoft/uf2/blob/b05acf5/README.md
+doc-ref: https://github.com/microsoft/uf2/blob/90e9741f217f5a40c98ba74d663e408041037578/README.md
 seq:
   - id: uf2_block_start
     type: uf2_block
