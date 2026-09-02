@@ -36,12 +36,12 @@ doc: |
 
 doc-ref: https://github.com/microsoft/uf2/blob/90e9741f217f5a40c98ba74d663e408041037578/README.md
 seq:
-  - id: block_start
+  - id: first_block
     type: block
   - id: blocks
     type: block
     repeat: expr
-    repeat-expr: block_start.num_blocks - 1
+    repeat-expr: first_block.num_blocks - 1
 types:
   block:
     -orig-id: UF2_Block
