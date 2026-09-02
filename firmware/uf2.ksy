@@ -92,6 +92,14 @@ types:
     seq:
       - id: value
         type: u4
+        valid:
+          expr: (_ & ~0x0000_f001) == 0
+        doc: |
+          Only the five bits that we cover in value instances below are defined,
+          and no other bit may be set. The [official
+          spec](https://github.com/microsoft/uf2/blob/90e9741f217f5a40c98ba74d663e408041037578/README.md#flags)
+          says "Currently, there are five flags defined". If any other flags are
+          added in the future, this .ksy spec will need to be updated.
     instances:
       not_main_flash:
         -orig-id:
