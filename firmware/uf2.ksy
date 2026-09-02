@@ -44,6 +44,7 @@ seq:
     repeat-expr: uf2_block_start.num_blocks - 1
 types:
   uf2_block:
+    -webide-representation: 'Block {block_number:dec} - {flags:flags}'
     seq:
       - id: magic
         -orig-id: magicStart0
