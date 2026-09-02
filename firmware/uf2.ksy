@@ -70,6 +70,11 @@ types:
         -orig-id: fileSize
         type: u4
         if: not flags.has_family_id
+        doc: |
+          Size of the file this block belongs to, but only if
+          `flags.is_file_container` is true. Otherwise, the official spec allows
+          this field to be set to anything - though in practice, it's always
+          zero.
       - id: family_id
         -orig-id: familyID
         type: u4
