@@ -36,14 +36,15 @@ doc: |
 
 doc-ref: https://github.com/microsoft/uf2/blob/90e9741f217f5a40c98ba74d663e408041037578/README.md
 seq:
-  - id: uf2_block_start
-    type: uf2_block
-  - id: uf2_blocks
-    type: uf2_block
+  - id: block_start
+    type: block
+  - id: blocks
+    type: block
     repeat: expr
-    repeat-expr: uf2_block_start.num_blocks - 1
+    repeat-expr: block_start.num_blocks - 1
 types:
-  uf2_block:
+  block:
+    -orig-id: UF2_Block
     -webide-representation: 'Block {block_number:dec} - {flags:flags}'
     seq:
       - id: magic
