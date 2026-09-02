@@ -90,24 +90,78 @@ types:
         if: flags.has_family_id
       - id: data
         size: 476
+        type: block_data
       - id: final_magic
         -orig-id: magicEnd
         contents: [0x30, 0x6f, 0xb1, 0x0a]
+  block_data:
+    seq:
+      - id: payload
+        size: _parent.len_payload
+        doc: |
+          The bytes to be written to `_parent.target_address`, which is either
+          an address in flash, or an offset within a file with the name
+          `file_name` if `_parent.flags.is_file_container` is set.
+      - id: file_name
+        type: strz
+        encoding: UTF-8
+        if: _parent.flags.is_file_container
+      - id: extension_tags
+        type: extension_tag
+        repeat: until
+        repeat-until: _.len_tag == 0
+        if: _parent.flags.has_extension_tags
+  extension_tag:
+    doc-ref: https://github.com/microsoft/uf2/blob/90e9741f217f5a40c98ba74d663e408041037578/README.md#extension-tags
+    -webide-representation: '{tag_type}: {len_value:dec} bytes ({len_tag:dec} total)'
+    seq:
+      - id: len_tag
+        type: u1
+        valid:
+          expr: _ == 0 or _ >= min_len_tag
+        doc: |
+          Total size of the tag in bytes, including this byte and `tag_type`, so
+          at least 4. The exception is the last tag which terminates the list -
+          it specifies a total size of 0.
+      - id: tag_type
+        type: b24le
+        enum: extension_tag_type
+      - id: value
+        size: len_value
+        if: len_tag != 0
+      - id: padding
+        size: -len_tag % 4
+        doc: |
+          Tags are 4-byte aligned, so a tag whose size is not a multiple
+          of 4 is followed by padding.
+    instances:
+      min_len_tag:
+        value: len_tag._sizeof + tag_type._sizeof
+      len_value:
+        value: 'len_tag >= min_len_tag ? len_tag - min_len_tag : 0'
   flags:
     doc-ref:
       - https://github.com/microsoft/uf2/blob/90e9741f217f5a40c98ba74d663e408041037578/uf2.h#L43-L47
       - https://github.com/raspberrypi/pico-sdk/blob/98a542c1a62fb549ffb5d66a3e5892b06276b670/src/common/boot_uf2_headers/include/boot/uf2.h#L23-L27 Git tag "2.3.0"
+    -webide-representation: '{value}'
     seq:
       - id: value
         type: u4
         valid:
-          expr: (_ & ~0x0000_f001) == 0
+          expr: |
+            (_ & ~0x0000_f001) == 0 and
+            not (is_file_container and has_extension_tags)
         doc: |
           Only the five bits that we cover in value instances below are defined,
           and no other bit may be set. The [official
           spec](https://github.com/microsoft/uf2/blob/90e9741f217f5a40c98ba74d663e408041037578/README.md#flags)
           says "Currently, there are five flags defined". If any other flags are
           added in the future, this .ksy spec will need to be updated.
+
+          Since the `is_file_container` and `has_extension_tags` flags have
+          different ideas of what should appear in the `data` field after the
+          payload, it logically follows that both cannot be set simultaneously
+          (although the official spec doesn't mention this).
     instances:
       not_main_flash:
         -orig-id:
@@ -127,17 +181,17 @@ types:
           When set, the UF2 format is used as a container for regular files
           (akin to a TAR file, or ZIP archive without compression).
 
-          `target_address` is the offset within the current file where the
-          payload should be written and `file_size` is the size of that file.
-          The file name is stored in `data` right after the payload, terminated
-          with a `0x00` byte.
+          `target_address` is the offset in the file where the payload is to be
+          written, and `file_size` is the size of that file. The name of the
+          destination file is stored in `data.file_name`.
       has_family_id:
         -orig-id:
           - UF2_FLAG_FAMILY_ID # microsoft/uf2
           - UF2_FLAG_FAMILY_ID_PRESENT # raspberrypi/pico-sdk
         value: value & 0x0000_2000 != 0
         doc: |
-          The field at offset 28 is `family_id` instead of `file_size`.
+          The field at offset 28 in the block is `family_id` instead of
+          `file_size`.
       has_md5_checksum:
         -orig-id:
           - UF2_FLAG_MD5_CHKSUM # microsoft/uf2
@@ -152,12 +206,34 @@ types:
           - UF2_FLAG_EXTENSION_TAGS # microsoft/uf2
           - UF2_FLAG_EXTENSION_FLAGS_PRESENT # raspberrypi/pico-sdk
         value: value & 0x0000_8000 != 0
-        doc: |
-          A list of tags follows the payload, i.e. it starts at
-          `data[len_payload]`. Every tag is 4-byte aligned and consists of its
-          total size in bytes (`u1`), its type (3 bytes) and its value. The list
-          is terminated by a tag of size 0 and type 0.
+        doc: Indicates whether extension tags are present after the payload.
 enums:
+  extension_tag_type:
+    0x000000:
+      id: end
+      doc: |
+        According to the official spec, this type should be used in the last tag
+        with `len_tag == 0`, which terminates the list of extension tags.
+    0x9fc7bc:
+      id: version
+      doc: Version of the firmware file, as a UTF-8 semver string
+    0x650d9d:
+      id: description
+      doc: |
+        Description of the device for which the firmware file is destined
+        (UTF-8)
+    0x0be9f7:
+      id: page_size
+      doc: Page size of the target device, as a 32-bit unsigned number
+    0xb46db0:
+      id: sha2_checksum
+      doc: SHA-2 checksum of firmware (can be of various sizes)
+    0xc8a729:
+      id: device_type_id
+      doc: |
+        Device type identifier, a refinement of `family_id` meant to identify a
+        kind of device rather than only an MCU. 32-bit or 64-bit number. Can be
+        a hash of the `extension_tag_type::description` tag.
   family_id:
     0x16573617:
       id: atmega32
