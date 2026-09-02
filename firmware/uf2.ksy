@@ -52,7 +52,7 @@ types:
         -orig-id: magicStart1
         contents: [0x57, 0x51, 0x5d, 0x9e]
       - id: flags
-        type: u4
+        type: flags
       - id: target_address
         -orig-id: targetAddr
         type: u4
@@ -68,17 +68,73 @@ types:
       - id: file_size
         -orig-id: fileSize
         type: u4
-        if: flags & 0x00002000 == 0
+        if: not flags.has_family_id
       - id: family_id
         -orig-id: familyID
         type: u4
         enum: family_id
-        if: flags & 0x00002000 != 0
+        if: flags.has_family_id
       - id: data
         size: 476
       - id: final_magic
         -orig-id: magicEnd
         contents: [0x30, 0x6f, 0xb1, 0x0a]
+  flags:
+    doc-ref:
+      - https://github.com/microsoft/uf2/blob/90e9741f217f5a40c98ba74d663e408041037578/uf2.h#L43-L47
+      - https://github.com/raspberrypi/pico-sdk/blob/98a542c1a62fb549ffb5d66a3e5892b06276b670/src/common/boot_uf2_headers/include/boot/uf2.h#L23-L27 Git tag "2.3.0"
+    seq:
+      - id: value
+        type: u4
+    instances:
+      not_main_flash:
+        -orig-id:
+          - UF2_FLAG_NOFLASH # microsoft/uf2
+          - UF2_FLAG_NOT_MAIN_FLASH # raspberrypi/pico-sdk
+        value: value & 0x0000_0001 != 0
+        doc: |
+          Indicates that this block should be skipped when writing the device
+          flash. It can be used to store data that does not fit on the device,
+          typically embedded source code or debug info.
+      is_file_container:
+        -orig-id:
+          - UF2_FLAG_FILECONTAINER # microsoft/uf2
+          - UF2_FLAG_FILE_CONTAINER # raspberrypi/pico-sdk
+        value: value & 0x0000_1000 != 0
+        doc: |
+          When set, the UF2 format is used as a container for regular files
+          (akin to a TAR file, or ZIP archive without compression).
+
+          `target_address` is the offset within the current file where the
+          payload should be written and `file_size` is the size of that file.
+          The file name is stored in `data` right after the payload, terminated
+          with a `0x00` byte.
+      has_family_id:
+        -orig-id:
+          - UF2_FLAG_FAMILY_ID # microsoft/uf2
+          - UF2_FLAG_FAMILY_ID_PRESENT # raspberrypi/pico-sdk
+        value: value & 0x0000_2000 != 0
+        doc: |
+          The field at offset 28 is `family_id` instead of `file_size`.
+      has_md5_checksum:
+        -orig-id:
+          - UF2_FLAG_MD5_CHKSUM # microsoft/uf2
+          - UF2_FLAG_MD5_PRESENT # raspberrypi/pico-sdk
+        value: value & 0x0000_4000 != 0
+        doc: |
+          The last 24 bytes of `data` hold the start address (`u4`), the length
+          (`u4`) and the MD5 checksum (16 bytes) of a region that doesn't need
+          to be flashed again if the checksum matches.
+      has_extension_tags:
+        -orig-id:
+          - UF2_FLAG_EXTENSION_TAGS # microsoft/uf2
+          - UF2_FLAG_EXTENSION_FLAGS_PRESENT # raspberrypi/pico-sdk
+        value: value & 0x0000_8000 != 0
+        doc: |
+          A list of tags follows the payload, i.e. it starts at
+          `data[len_payload]`. Every tag is 4-byte aligned and consists of its
+          total size in bytes (`u1`), its type (3 bytes) and its value. The list
+          is terminated by a tag of size 0 and type 0.
 enums:
   family_id:
     0x16573617:
