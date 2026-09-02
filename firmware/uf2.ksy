@@ -66,6 +66,13 @@ types:
       - id: num_blocks
         -orig-id: numBlocks
         type: u4
+        valid:
+          min: block_number + 1
+        doc: |
+          Number of blocks that make up the UF2 file to which this block
+          belongs. Every block of a file has the same value. It is at least 1
+          and every `block_number` in the file must be less than this value
+          (which is validated by this Kaitai Struct implementation).
       - id: file_size
         -orig-id: fileSize
         type: u4
