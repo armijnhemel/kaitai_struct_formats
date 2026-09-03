@@ -45,7 +45,7 @@ seq:
 types:
   block:
     -orig-id: UF2_Block
-    -webide-representation: 'Block {block_number:dec} - {flags:flags}'
+    -webide-representation: 'Block {block_number:dec} - {flags:flags} {family_id}'
     seq:
       - id: magic
         -orig-id: magicStart0
