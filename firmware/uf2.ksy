@@ -58,9 +58,31 @@ types:
       - id: target_address
         -orig-id: targetAddr
         type: u4
+        valid:
+          expr: _ % 4 == 0
+        doc: |
+          Address in flash where `data.payload` should be written, or an offset
+          in the file specified by `data.file_name` if `flags.file_container` is
+          set.
+
+          The [official
+          spec](https://github.com/microsoft/uf2/blob/90e9741f217f5a40c98ba74d663e408041037578/README.md#payload-sizes)
+          says:
+
+          > In any event, payload size and target address should always be
+          > 4-byte aligned.
       - id: len_payload
         -orig-id: payloadSize
         type: u4
+        valid:
+          expr: _ % 4 == 0
+        doc: |
+          The [official
+          spec](https://github.com/microsoft/uf2/blob/90e9741f217f5a40c98ba74d663e408041037578/README.md#payload-sizes)
+          says:
+
+          > In any event, payload size and target address should always be
+          > 4-byte aligned.
       - id: block_number
         -orig-id: blockNo
         type: u4
@@ -163,8 +185,8 @@ types:
         size: _parent.len_payload
         doc: |
           The bytes to be written to `_parent.target_address`, which is either
-          an address in flash, or an offset within a file with the name
-          `file_name` if `_parent.flags.is_file_container` is set.
+          an address in flash, or an offset in the file specified by `file_name`
+          if `_parent.flags.is_file_container` is set.
       - id: file_name
         type: strz
         encoding: UTF-8
