@@ -196,6 +196,24 @@ types:
         repeat: until
         repeat-until: _.len_tag == 0
         if: _parent.flags.has_extension_tags
+    instances:
+      md5_checksum:
+        pos: _io.size - 24
+        type: md5_checksum
+        if: _parent.flags.has_md5_checksum
+        doc: |
+          Describes a region that doesn't need to be flashed again if the
+          checksum matches.
+
+          The [official
+          spec](https://github.com/microsoft/uf2/blob/90e9741f217f5a40c98ba74d663e408041037578/README.md#md5-checksum)
+          says that "This is currently only used on ESP32", but no real-world
+          firmware sample has been found (at least none of the .uf2 files from
+          <https://github.com/adafruit/tinyuf2/releases>,
+          [MicroPython](https://micropython.org/download/) or
+          [CircuitPython](https://circuitpython.org/downloads) contain it). It
+          was found only in some synthetic test files, e.g.
+          <https://github.com/umi-eng/uftwo/blob/35bccf75b4f81c43f088696a8c4a9912f1f4104e/uftwo/tests/checksum_256.uf2>.
   extension_tag:
     doc-ref: https://github.com/microsoft/uf2/blob/90e9741f217f5a40c98ba74d663e408041037578/README.md#extension-tags
     -webide-representation: '{tag_type}: {len_value:dec} bytes ({len_tag:dec} total)'
@@ -224,6 +242,15 @@ types:
         value: len_tag._sizeof + tag_type._sizeof
       len_value:
         value: 'len_tag >= min_len_tag ? len_tag - min_len_tag : 0'
+  md5_checksum:
+    doc-ref: https://github.com/microsoft/uf2/blob/90e9741f217f5a40c98ba74d663e408041037578/README.md#md5-checksum
+    seq:
+      - id: start_address
+        type: u4
+      - id: len_region
+        type: u4
+      - id: md5
+        size: 16
   flags:
     doc-ref:
       - https://github.com/microsoft/uf2/blob/90e9741f217f5a40c98ba74d663e408041037578/uf2.h#L43-L47
@@ -282,10 +309,7 @@ types:
           - UF2_FLAG_MD5_CHKSUM # microsoft/uf2
           - UF2_FLAG_MD5_PRESENT # raspberrypi/pico-sdk
         value: value & 0x0000_4000 != 0
-        doc: |
-          The last 24 bytes of `data` hold the start address (`u4`), the length
-          (`u4`) and the MD5 checksum (16 bytes) of a region that doesn't need
-          to be flashed again if the checksum matches.
+        doc: Indicates whether `md5_checksum` is present at the end of `data`.
       has_extension_tags:
         -orig-id:
           - UF2_FLAG_EXTENSION_TAGS # microsoft/uf2
