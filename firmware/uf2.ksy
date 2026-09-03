@@ -64,7 +64,7 @@ types:
       - id: block_number
         -orig-id: blockNo
         type: u4
-      - id: num_blocks
+      - id: num_blocks_raw
         -orig-id: numBlocks
         type: u4
         valid:
@@ -94,6 +94,69 @@ types:
       - id: final_magic
         -orig-id: magicEnd
         contents: [0x30, 0x6f, 0xb1, 0x0a]
+    instances:
+      num_blocks:
+        value: 'is_rp2350_e10_block ? 1 : num_blocks_raw'
+      is_rp2350_e10_block:
+        value: |
+          (flags.value == 0x2000 or flags.value == 0xa000)
+          and family_id == family_id::rp2xxx_absolute
+          and num_blocks_raw == 2
+          and block_number == 0
+          and len_payload == 256
+          and data.payload.first == 0xef
+          and data.payload.last == 0xef
+          and (
+            not flags.has_extension_tags
+            or data.extension_tags[0].len_tag == 0
+            or (
+              data.extension_tags[0].len_tag == 4
+              and data.extension_tags[0].tag_type == extension_tag_type::rp2_ignore_block
+            )
+          )
+        doc: |
+          Determines whether this is a block that `picotool` prepends to RP2350
+          flash images as a workaround for erratum RP2350-E10 (i.e. a hardware
+          bug in the A2 version of the RP2350 boot ROM).
+
+          Such a block is always written on its own, but its `num_blocks_raw` is
+          set to 2. If we trusted this value, we would attempt to read one block
+          too many (which would most likely fail). Therefore, we must correct it
+          to 1 before using it.
+
+          The conditions for detecting this block come from the
+          [`check_abs_block()`](https://github.com/raspberrypi/picotool/blob/6f6458d792b93685a11423b244a585eaa99eafcf/elf2uf2/elf2uf2.cpp#L147)
+          function in `picotool`. However, there are some differences:
+
+          1. In Kaitai Struct, we cannot easily check whether all 256 payload
+             bytes are set to `0xef`, so we only check the first and last bytes.
+          2. Since I found a .uf2 file in the wild where
+             `flags.has_extension_tags` is true, but there are actually no
+             extension tags (the first and only tag has a size of 0, which is
+             just a terminator), our condition allows for this case. You can
+             download an example of such a .uf2 file here:
+             <https://github.com/neednotapply/DC32-cfw/releases/tag/1.69.13.37>
+
+          It's worth noting that we cannot require the presence of the
+          `extension_tag_type::rp2_ignore_block`
+          (`UF2_EXTENSION_RP2_IGNORE_BLOCK`) tag because the UF2 files generated
+          by `picotool` prior to
+          <https://github.com/raspberrypi/picotool/commit/78c9bd121b09399823b67ee7ea89003ca0d3315f>
+          don't have it. Therefore, we check whether this tag is present only if
+          `flags.has_extension_tags` is set.
+
+          Test .uf2 files with this special block can be downloaded from
+          <https://micropython.org/download/RPI_PICO2/>. Note that the all .uf2
+          files there are actually two UF2 (sub)files concatenated, and this
+          Kaitai Struct implementation parses only one at a time (so in order to
+          parse both, you need something like the helper spec `uf2_files.ksy`
+          from
+          <https://github.com/kaitai-io/kaitai_struct_formats/pull/542#discussion_r3906386820>).
+          v1.24.x releases predate the `extension_tag_type::rp2_ignore_block`
+          tag, while releases v1.25.0 and later include it.
+        doc-ref:
+          - https://github.com/raspberrypi/picotool/blob/6f6458d792b93685a11423b244a585eaa99eafcf/elf2uf2/elf2uf2.cpp#L147 Git tag "2.3.0"
+          - https://github.com/raspberrypi/picotool/commit/78c9bd121b09399823b67ee7ea89003ca0d3315f
   block_data:
     seq:
       - id: payload
@@ -234,6 +297,15 @@ enums:
         Device type identifier, a refinement of `family_id` meant to identify a
         kind of device rather than only an MCU. 32-bit or 64-bit number. Can be
         a hash of the `extension_tag_type::description` tag.
+    0x9957e3:
+      id: rp2_ignore_block
+      -orig-id: UF2_EXTENSION_RP2_IGNORE_BLOCK
+      doc: |
+        The block is to be ignored. This value doesn't come from the official
+        spec, but from the Raspberry Pi Pico SDK. It's written with no value, so
+        the whole tag is the 4 bytes `04 e3 57 99`. See the
+        `is_rp2350_e10_block` value instance in the `block` type.
+      doc-ref: https://github.com/raspberrypi/pico-sdk/blob/98a542c1a62fb549ffb5d66a3e5892b06276b670/src/common/boot_uf2_headers/include/boot/uf2.h#L46 Git tag "2.3.0"
   family_id:
     0x16573617:
       id: atmega32
