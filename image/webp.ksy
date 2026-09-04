@@ -118,9 +118,9 @@ types:
         type: u2
   anmf:
     seq:
-      - id: frame_x
+      - id: frame_x_div_2
         type: b24le
-      - id: frame_y
+      - id: frame_y_div_2
         type: b24le
       - id: frame_width_minus_1
         type: b24le
@@ -138,6 +138,10 @@ types:
       - id: data
         size-eos: true
     instances:
+      frame_x:
+        value: frame_x_div_2 * 2
+      frame_y:
+        value: frame_y_div_2 * 2
       frame_width:
         value: frame_width_minus_1 + 1
       frame_height:
