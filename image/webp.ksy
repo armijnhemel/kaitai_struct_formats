@@ -1,6 +1,17 @@
 meta:
   id: webp
   title: WebP
+  file-extension: webp
+  xref:
+    justsolve: WebP
+    loc: fdd000577
+    mime: image/webp
+    pronom:
+      - fmt/566 # WebP Lossy
+      - fmt/567 # WebP Lossless
+      - fmt/568 # WebP Extended
+    rfc: 9649
+    wikidata: Q62617958
   license: CC0-1.0
   ks-version: 0.11
   endian: le
