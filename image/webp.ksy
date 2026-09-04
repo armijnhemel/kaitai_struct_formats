@@ -14,8 +14,8 @@ meta:
     wikidata: Q62617958
   license: CC0-1.0
   ks-version: '0.11'
-  endian: le
   encoding: UTF-8
+  endian: le
 doc-ref:
   - https://developers.google.com/speed/webp/docs/riff_container
 seq:
