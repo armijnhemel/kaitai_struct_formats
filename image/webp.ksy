@@ -59,13 +59,32 @@ types:
         contents: [0x00]
         if: len_data % 2 != 0
   vp8l:
+    meta:
+      bit-endian: le
     doc-ref: https://developers.google.com/speed/webp/docs/webp_lossless_bitstream_specification
     seq:
       - id: signature
         type: u1
         valid: 0x2f
+      - id: image_width_minus_1
+        type: b14
+      - id: image_height_minus_1
+        type: b14
+      - id: alpha_is_used
+        type: b1
+        doc: |
+          A hint only - it should not impact decoding. It should be `false` when
+          all alpha values are 255 in the picture, and `true` otherwise.
+      - id: version_number
+        type: b3
+        valid: 0
       - id: data
         size-eos: true
+    instances:
+      image_width:
+        value: image_width_minus_1 + 1
+      image_height:
+        value: image_height_minus_1 + 1
   vp8x:
     seq:
       - id: reserved1
