@@ -91,6 +91,12 @@ types:
         type: b24le
       - id: canvas_height_minus_1
         type: b24le
+        valid:
+          # From <https://developers.google.com/speed/webp/docs/riff_container#extended_file_format>:
+          #
+          # > The product of Canvas Width and Canvas Height MUST be at most
+          # > `2^32 - 1`.
+          max: (0xffff_ffff / canvas_width) - 1
     instances:
       canvas_width:
         value: canvas_width_minus_1 + 1
