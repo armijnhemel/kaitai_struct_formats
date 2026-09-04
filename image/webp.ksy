@@ -114,10 +114,10 @@ types:
           in-enum: true
       - id: filtering
         type: b2
-        enum: filter_methods
+        enum: filtering_method
       - id: compression
         type: b2
-        enum: compression
+        enum: compression_method
         valid:
           in-enum: true
   anim:
@@ -177,12 +177,12 @@ enums:
     # some files, for example in YTMusic.apk in some Android devices
     # have a different padding byte for the XMP FourCC.
     0x00504d58: xmp_var
-  filter_methods:
+  filtering_method:
     0: no_filter
     1: horizontal
     2: vertical
     3: gradient
-  compression:
+  compression_method:
     0: no_compression
     1: webp_lossless
   preprocessing:
