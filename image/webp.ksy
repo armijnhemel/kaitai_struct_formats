@@ -56,7 +56,7 @@ types:
             chunk_names::xmp: xmp
             chunk_names::xmp_var: xmp
       - id: padding
-        size: 1
+        contents: [0x00]
         if: len_data % 2 != 0
   vp8l:
     doc-ref: https://developers.google.com/speed/webp/docs/webp_lossless_bitstream_specification
@@ -70,6 +70,7 @@ types:
     seq:
       - id: reserved1
         type: b2
+        valid: 0
       - id: icc_profile
         type: b1
       - id: alpha
@@ -82,6 +83,7 @@ types:
         type: b1
       - id: reserved2
         type: b1
+        valid: false
       - id: reserved3
         type: b24
         valid: 0
@@ -128,6 +130,7 @@ types:
         type: b24le
       - id: reserved
         type: b6
+        valid: 0
       - id: blending_method
         type: b1
       - id: disposal_method
