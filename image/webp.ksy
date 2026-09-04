@@ -51,6 +51,7 @@ types:
             chunk_names::alph: alph
             chunk_names::anim: anim
             chunk_names::anmf: anmf
+            chunk_names::vp8: vp8
             chunk_names::vp8l: vp8l
             chunk_names::vp8x: vp8x
             chunk_names::xmp: xmp
@@ -58,6 +59,32 @@ types:
       - id: padding
         contents: [0x00]
         if: len_data % 2 != 0
+  vp8:
+    meta:
+      bit-endian: le
+    doc-ref: https://www.rfc-editor.org/rfc/rfc6386#section-9.1
+    seq:
+      - id: frame_type
+        type: b1
+        valid: false # the VP8 chunk always holds a key frame
+      - id: version
+        type: b3
+      - id: show_frame
+        type: b1
+      - id: len_first_partition
+        type: b19
+      - id: start_code
+        contents: [0x9d, 0x01, 0x2a]
+      - id: width
+        type: b14
+      - id: horizontal_scale
+        type: b2
+      - id: height
+        type: b14
+      - id: vertical_scale
+        type: b2
+      - id: data
+        size-eos: true
   vp8l:
     meta:
       bit-endian: le
