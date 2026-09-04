@@ -13,7 +13,7 @@ meta:
     rfc: 9649
     wikidata: Q62617958
   license: CC0-1.0
-  ks-version: 0.11
+  ks-version: '0.11'
   endian: le
   encoding: UTF-8
 doc-ref:
