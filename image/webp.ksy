@@ -90,10 +90,10 @@ types:
       - id: canvas_height
         type: b24le
     instances:
-      height:
-        value: canvas_height + 1
       width:
         value: canvas_width + 1
+      height:
+        value: canvas_height + 1
   alph:
     seq:
       - id: reserved
@@ -135,10 +135,10 @@ types:
       - id: data
         size-eos: true
     instances:
-      height:
-        value: frame_height + 1
       width:
         value: frame_width + 1
+      height:
+        value: frame_height + 1
   xmp:
     seq:
       - id: data
