@@ -16,6 +16,7 @@ meta:
   ks-version: '0.11'
   encoding: UTF-8
   endian: le
+  bit-endian: be
 doc-ref: https://developers.google.com/speed/webp/docs/riff_container
 seq:
   - id: magic
