@@ -178,13 +178,13 @@ enums:
     # have a different padding byte for the XMP FourCC.
     0x00504d58: xmp_var
   filtering_method:
-    0: no_filter
+    0: none
     1: horizontal
     2: vertical
     3: gradient
   compression_method:
-    0: no_compression
+    0: none
     1: webp_lossless
   preprocessing:
-    0: no_preprocessing
+    0: none
     1: level_reduction
