@@ -104,12 +104,16 @@ types:
       - id: preprocessing
         type: b2
         enum: preprocessing
+        valid:
+          in-enum: true
       - id: filtering
         type: b2
         enum: filter_methods
       - id: compression
         type: b2
         enum: compression
+        valid:
+          in-enum: true
   anim:
     seq:
       - id: background
