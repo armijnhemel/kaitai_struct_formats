@@ -85,15 +85,15 @@ types:
       - id: reserved3
         type: b24
         valid: 0
-      - id: canvas_width
+      - id: canvas_width_minus_1
         type: b24le
-      - id: canvas_height
+      - id: canvas_height_minus_1
         type: b24le
     instances:
-      width:
-        value: canvas_width + 1
-      height:
-        value: canvas_height + 1
+      canvas_width:
+        value: canvas_width_minus_1 + 1
+      canvas_height:
+        value: canvas_height_minus_1 + 1
   alph:
     seq:
       - id: reserved
@@ -120,9 +120,9 @@ types:
         type: b24le
       - id: frame_y
         type: b24le
-      - id: frame_width
+      - id: frame_width_minus_1
         type: b24le
-      - id: frame_height
+      - id: frame_height_minus_1
         type: b24le
       - id: duration
         type: b24le
@@ -135,10 +135,10 @@ types:
       - id: data
         size-eos: true
     instances:
-      width:
-        value: frame_width + 1
-      height:
-        value: frame_height + 1
+      frame_width:
+        value: frame_width_minus_1 + 1
+      frame_height:
+        value: frame_height_minus_1 + 1
   xmp:
     seq:
       - id: data
