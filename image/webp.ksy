@@ -16,8 +16,7 @@ meta:
   ks-version: '0.11'
   encoding: UTF-8
   endian: le
-doc-ref:
-  - https://developers.google.com/speed/webp/docs/riff_container
+doc-ref: https://developers.google.com/speed/webp/docs/riff_container
 seq:
   - id: magic
     contents: "RIFF"
@@ -59,7 +58,7 @@ types:
         size: 1
         if: len_data % 2 != 0
   vp8l:
-    # https://developers.google.com/speed/webp/docs/webp_lossless_bitstream_specification
+    doc-ref: https://developers.google.com/speed/webp/docs/webp_lossless_bitstream_specification
     seq:
       - id: signature
         type: u1
