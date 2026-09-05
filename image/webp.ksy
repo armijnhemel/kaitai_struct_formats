@@ -7,9 +7,9 @@ meta:
     loc: fdd000577
     mime: image/webp
     pronom:
-      - fmt/566 # WebP Lossy
-      - fmt/567 # WebP Lossless
-      - fmt/568 # WebP Extended
+      - fmt/566 # WebP Lossy ('VP8 ')
+      - fmt/567 # WebP Lossless ('VP8L')
+      - fmt/568 # WebP Extended ('VP8X')
     rfc: 9649
     wikidata: Q62617958
   license: CC0-1.0
@@ -215,19 +215,19 @@ types:
         encoding: UTF-8
 enums:
   chunk_names:
-    0x48504c41: alph
-    0x4d494e41: anim
-    0x464d4e41: anmf
-    0x46495845: exif
-    0x4d475246: frgm
-    0x50434349: iccp
-    0x4c385056: vp8l
-    0x20385056: vp8
-    0x58385056: vp8x
-    0x20504d58: xmp
+    0x48504c41: alph # 'ALPH'
+    0x4d494e41: anim # 'ANIM'
+    0x464d4e41: anmf # 'ANMF'
+    0x46495845: exif # 'EXIF'
+    0x4d475246: frgm # 'FRGM'
+    0x50434349: iccp # 'ICCP'
+    0x4c385056: vp8l # 'VP8L'
+    0x20385056: vp8  # 'VP8 '
+    0x58385056: vp8x # 'VP8X'
+    0x20504d58: xmp  # 'XMP '
     # some files, for example in YTMusic.apk in some Android devices
     # have a different padding byte for the XMP FourCC.
-    0x00504d58: xmp_var
+    0x00504d58: xmp_var # 'XMP\0'
   filtering_method:
     0: none
     1: horizontal
