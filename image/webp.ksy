@@ -35,6 +35,7 @@ types:
         type: chunk
         repeat: eos
   chunk:
+    -webide-representation: '{name}'
     seq:
       - id: name
         type: u4
