@@ -69,6 +69,9 @@ types:
         valid: false # the VP8 chunk always holds a key frame
       - id: version
         type: b3
+        valid:
+          # See https://github.com/webmproject/libwebp/blob/4fa21912338357f89e4fd51cf2368325b59e9bd9/src/dec/vp8_dec.c#L305-L308 (Git tag "v1.6.0")
+          max: 3 # only versions 0-3 are defined
       - id: show_frame
         type: b1
       - id: len_first_partition
