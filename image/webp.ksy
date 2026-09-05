@@ -166,6 +166,8 @@ types:
         enum: compression_method
         valid:
           in-enum: true
+      - id: data
+        size-eos: true
   anim:
     seq:
       - id: background
