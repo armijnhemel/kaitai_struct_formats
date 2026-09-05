@@ -172,11 +172,24 @@ types:
       - id: data
         size-eos: true
   anim:
+    doc-ref: https://developers.google.com/speed/webp/docs/riff_container#animation
     seq:
-      - id: background
-        type: u4
+      - id: background_color
+        type: bg_color
       - id: loop_count
         type: u2
+    types:
+      bg_color:
+        -webide-representation: 'rgba({red:dec}, {green:dec}, {blue:dec}, {alpha:dec})'
+        seq:
+          - id: blue
+            type: u1
+          - id: green
+            type: u1
+          - id: red
+            type: u1
+          - id: alpha
+            type: u1
   anmf:
     seq:
       - id: frame_x_div_2
