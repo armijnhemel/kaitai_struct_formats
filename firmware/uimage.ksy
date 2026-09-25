@@ -53,21 +53,54 @@ types:
       - id: name_or_asus_info
         size: 32
         type: name_or_asus_info
-    instances:
-      name:
-        value: name_or_asus_info.name
-      asus_info:
-        value: name_or_asus_info.asus_info
   name_or_asus_info:
     seq:
       - id: name
         type: strz
         encoding: UTF-8
         eos-error: false
-    instances:
-      asus_info:
-        pos: 0
+        if: not has_asus_info
+      - id: asus_info
         type: asus_firmware_information
+        if: has_asus_info
+    instances:
+      has_asus_info:
+        value: byte0 < 0x20 and byte4 >= 0x20 and byte4 < 0x7f
+        doc: |
+          Whether this type stores ASUS firmware information (`asus_info`)
+          rather than an image name (`name`).
+
+          The header doesn't say which one it is, so we infer it using a
+          heuristic based on the layout of the `asus_firmware_information` type.
+          If ASUS firmware info is present, the first byte (the major kernel
+          version number) is a small integer (i.e. not a printable character),
+          and byte 4 (first byte of the product ID/model name) is a printable
+          character. An empty name is not mistaken for ASUS information, because
+          its byte 4 is a null byte.
+
+          The highest known major kernel version number is 9 (e.g. in
+          `DSL-N55U_9.0.0.4_380_3925-gad8f412_Annex_A.trx` from
+          <https://dlcdnets.asus.com/pub/ASUS/wireless/DSL-N55U/FW_DSL_N55U_90043803925.zip>,
+          released on 2016-08-04 and listed on
+          <https://www.asus.com/supportonly/dsl-n55u/helpdesk_bios/>). ASUS
+          seems to use such high major versions (9, sometimes 7) for beta
+          releases, whereas regular releases use 3 (or 1 in older firmware).
+
+          It can also be 0, in particular due to a bug in the MediaTek MT798X
+          build of ASUS's `mkimage` (it reads the `-V` values from fixed `argv`
+          positions, even though it parses the options using `getopt()` - see
+          <https://github.com/blocktrron/tuf-ax4200-gpl/blob/a4fe37f4d78473f97c6d47cf93d97c3811af90cc/release/src-mtk-MT798X/Uboot-upstream/tools/mkimage.c#L317-L333>).
+          For example, this is the case in
+          `RT-AX52_3.0.0.4_388_34015-g9488655.trx` from
+          <https://dlcdnets.asus.com/pub/ASUS/wireless/RT-AX52/FW_RT-AX52_300438834015.zip>,
+          released on 2026-03-20 and listed on
+          <https://www.asus.com/supportonly/rt-ax52/helpdesk_bios/>.
+      byte0:
+        pos: 0
+        type: u1
+      byte4:
+        pos: 4
+        type: u1
   asus_firmware_information:
     seq:
       - id: kernel_version
