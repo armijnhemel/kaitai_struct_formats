@@ -61,8 +61,9 @@ types:
   name_or_asus_info:
     seq:
       - id: name
-        encoding: UTF-8
         type: strz
+        encoding: UTF-8
+        eos-error: false
     instances:
       asus_info:
         pos: 0
